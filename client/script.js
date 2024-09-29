@@ -29,7 +29,7 @@ function startCamera() {
             })
             .catch(function(err) {
                 console.log("Error accessing camera: " + err);
-                document.getElementById('emotion-result').innerHTML = "Error accessing camera. Please check your camera settings.";
+                document.getElementById('gemini-result').innerHTML = "Error accessing camera. Please check your camera settings.";
             });
     }
 }
@@ -53,7 +53,7 @@ function captureImage() {
 
     document.getElementById('photo-section').style.display = 'none';
     document.getElementById('result-section').style.display = 'block';
-    analyzeEmotion();
+    sendToGemini();
 }
 
 function stopCamera() {
@@ -63,58 +63,42 @@ function stopCamera() {
     }
 }
 
-async function analyzeEmotion() {
-    const apiKey = 'AIzaSyDqb1D_IhdyyYuFeCBlXP7aAYOiA9_P4NQ'; // Replace with your actual API key
-    const apiURL = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+// Send the image and prompt to the backend for processing by the Gemini API
+async function sendToGemini() {
+    const promptText = document.getElementById('prompt').value;
+
+    if (!promptText) {
+        alert("Please enter a prompt.");
+        return;
+    }
 
     const requestBody = {
-        requests: [
-            {
-                image: {
-                    content: capturedImage // Pass the base64 data
-                },
-                features: [
-                    {
-                        type: 'FACE_DETECTION',
-                        maxResults: 1
-                    }
-                ]
-            }
-        ]
+        image: capturedImage,
+        prompt: promptText
     };
 
     try {
-        const apiResponse = await fetch(apiURL, {
+        const response = await fetch('http://localhost:3000/analyze-prompt', {
             method: 'POST',
-            body: JSON.stringify(requestBody),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
         });
 
-        if (apiResponse.ok) {
-            const result = await apiResponse.json();
-            displayEmotionResult(result);
+        if (response.ok) {
+            const result = await response.json();
+            displayGeminiResult(result);
         } else {
-            const errorText = await apiResponse.text(); // Get error details
-            document.getElementById('emotion-result').innerHTML = `Error analyzing the image. Status: ${apiResponse.status} - ${apiResponse.statusText}`;
+            document.getElementById('gemini-result').innerHTML = `Error analyzing the image: ${response.statusText}`;
         }
     } catch (error) {
-        document.getElementById('emotion-result').innerHTML = `Error: ${error.message}`;
+        document.getElementById('gemini-result').innerHTML = `Error: ${error.message}`;
     }
 }
 
-function displayEmotionResult(result) {
-    const resultDiv = document.getElementById('emotion-result');
-    
-    if (result.responses && result.responses[0].faceAnnotations && result.responses[0].faceAnnotations.length > 0) {
-        const face = result.responses[0].faceAnnotations[0];
-        resultDiv.innerHTML = `Detected emotions:`;
-        resultDiv.innerHTML += `<br> Joy: ${face.joyLikelihood}`;
-        resultDiv.innerHTML += `<br> Sorrow: ${face.sorrowLikelihood}`;
-        resultDiv.innerHTML += `<br> Anger: ${face.angerLikelihood}`;
-        resultDiv.innerHTML += `<br> Surprise: ${face.surpriseLikelihood}`;
-    } else {
-        resultDiv.innerHTML = `No face detected in the image.`;
-    }
+// Display the Gemini API response
+function displayGeminiResult(result) {
+    const resultDiv = document.getElementById('gemini-result');
+    resultDiv.innerHTML = `Gemini Response: <br> ${result.generatedContent}`;
 }
 
 document.getElementById('restart').addEventListener('click', function() {

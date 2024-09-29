@@ -1,25 +1,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json({ limit: '10mb' })); // Handle large image files
 
-app.post('/analyze-emotion', async (req, res) => {
-    const { image } = req.body;
-    const apiKey = 'YOUR_GOOGLE_API_KEY';  // Keep your API key secure
-    const apiURL = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+
+app.get("/", (req, res) => {
+    res.send("<h2> backend is running...</h2>");
+  });
+  
+// Route for analyzing text prompt and returning the Gemini response
+app.post('/analyze-prompt', async (req, res) => {
+    const { prompt } = req.body;
+    const apiKey = 'AIzaSyDqb1D_IhdyyYuFeCBlXP7aAYOiA9_P4NQ';  // Replace with your actual API key
+    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const requestBody = {
-        requests: [
+        contents: [
             {
-                image: {
-                    content: image // Send base64 image content
-                },
-                features: [
+                parts: [
                     {
-                        type: 'FACE_DETECTION',
-                        maxResults: 1
+                        text: prompt // Send the text prompt to Gemini
                     }
                 ]
             }
@@ -27,20 +29,20 @@ app.post('/analyze-emotion', async (req, res) => {
     };
 
     try {
-        const apiResponse = await fetch(apiURL, {
-            method: 'POST',
-            body: JSON.stringify(requestBody),
+        // Send the POST request to the Gemini API using Axios
+        const apiResponse = await axios.post(apiURL, requestBody, {
             headers: { 'Content-Type': 'application/json' }
         });
 
-        if (apiResponse.ok) {
-            const result = await apiResponse.json();
-            res.json(result);
+        // If the response from the API is successful, send the result to the client
+        if (apiResponse.status === 200) {
+            res.json({ generatedContent: apiResponse.data.candidates[0].text });
         } else {
             res.status(apiResponse.status).send(apiResponse.statusText);
         }
     } catch (error) {
-        res.status(500).send('Error processing the image: ' + error.message);
+        console.error('Error processing the prompt:', error.message);
+        res.status(500).send('Error processing the prompt: ' + error.message);
     }
 });
 
