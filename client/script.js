@@ -64,7 +64,7 @@ function stopCamera() {
 }
 
 async function analyzeEmotion() {
-    const apiKey = 'YOUR_GOOGLE_CLOUD_VISION_API_KEY'; // Replace with your actual API key
+    const apiKey = 'AIzaSyDYcB93cc4t_EcNeOHYbD9-eca1jIBX5wg'; // Replace with your actual API key
     const apiURL = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
 
     const requestBody = {
@@ -83,6 +83,8 @@ async function analyzeEmotion() {
         ]
     };
 
+    console.log('Request Body:', JSON.stringify(requestBody)); // Log the request body
+
     try {
         console.log('Sending image to API...');
         const apiResponse = await fetch(apiURL, {
@@ -94,9 +96,11 @@ async function analyzeEmotion() {
         if (apiResponse.ok) {
             console.log('API response received');
             const result = await apiResponse.json();
+            console.log('API Result:', result); // Log the result
             displayEmotionResult(result);
         } else {
-            console.error('Error:', apiResponse.status, apiResponse.statusText);
+            const errorText = await apiResponse.text(); // Get error details
+            console.error('Error:', apiResponse.status, apiResponse.statusText, errorText);
             document.getElementById('emotion-result').innerHTML = `Error analyzing the image. Status: ${apiResponse.status} - ${apiResponse.statusText}`;
         }
     } catch (error) {
@@ -107,9 +111,10 @@ async function analyzeEmotion() {
 
 function displayEmotionResult(result) {
     const resultDiv = document.getElementById('emotion-result');
-    if (result.responses[0].faceAnnotations && result.responses[0].faceAnnotations.length > 0) {
+    
+    if (result.responses && result.responses[0].faceAnnotations && result.responses[0].faceAnnotations.length > 0) {
         const face = result.responses[0].faceAnnotations[0];
-        resultDiv.innerHTML = `Gemini Pro Vision detected the following emotions in the image:`;
+        resultDiv.innerHTML = `Detected emotions:`;
         resultDiv.innerHTML += `<br> Joy: ${face.joyLikelihood}`;
         resultDiv.innerHTML += `<br> Sorrow: ${face.sorrowLikelihood}`;
         resultDiv.innerHTML += `<br> Anger: ${face.angerLikelihood}`;
