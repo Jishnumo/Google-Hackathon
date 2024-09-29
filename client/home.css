@@ -1,41 +1,221 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+
+* {
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+}
+nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin: 20px;
+  padding: 0 50px;
+  position: absolute;
 }
 
-#container {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+li {
+  display: inline;
 }
-
-h1, h2 {
-  color: #333;
+a {
+  text-decoration: none;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
 }
-
-.consent-checkbox {
-  margin: 10px 0;
+h1 {
+  color: black;
+  font-size: 1.45;
 }
-
-button {
-  background-color: #007bff;
+a:hover,
+a#one {
   color: white;
+  background: linear-gradient(to right, #be85e6e9, #9623cc);
+}
+.fa-solid {
+  font-size: 1.66rem;
+}
+.fa-envelope{
+    font-size: 1.66rem;
+}
+a.login:hover {
+  color: grey;
+  background: none;
+}
+.home {
+  display: flex;
+  height: 100dvh;
+  background: linear-gradient(to top, #3b3291 30%, #286ea4, #286ea4b6, #d2e2fb);
+  background-image: url("asset/—Pngtree—mental\ health\ problems\ flat\ illustration_6855461.png");
+  background-position: center;
+  background-size: contain;
+}
+
+.home .title {
+    text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.501);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 20px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  color: #c418e6e9;
+  font-size: 80px;
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+}
+.home .btn {
+  position: absolute;
+  padding: 10px 20px;
+  font-size: 1.37rem;
   border: none;
-  border-radius: 5px;
-  padding: 10px;
-  cursor: pointer;
-  margin: 5px;
+  border-radius: 20px;
+  color: white;
+  background: linear-gradient(to right, #be85e6e9, #9623cc);
+  margin-top: 4rem;
+  top: 50%;
+  left: 48.5%;
+  transform: translate(-50%);
+  box-shadow: 0px 0px 6px linear-gradient(to right, #79d6e9, #5c6bc0);
+}
+.home .btn:hover{
+    background: linear-gradient(to right, #9623cc, #be85e6e9);
+    transition: .6s;
+}
+.writtings {
+  padding: 50px;
+}
+.writtings h3 {
+  font-size: 2rem;
+  padding: 50px 0;
 }
 
-button:hover {
-  background-color: #0056b3;
+.about {
+  color: white;
+  position: relative;
+}
+.combine{
+    background: linear-gradient(to top, #9623cc 30%, #a143cc, #a55ac8, #c291d8);
 }
 
-#emotion-result {
-  margin-top: 20px;
+.services {
+  z-index: 102;
+  top: -5%;
+  position: relative;
+  height: 80dvh;
+}
+.smain {
+  display: flex;
+  justify-content: center;
+}
+.ww {
+  padding: 40px 0;
+  text-align: center;
+}
+.description{
+  margin:20px;
+}
+.services h1 {
+  text-align: center;
+  font-size: 2.7rem;
+  color: white;
+  padding: 1.4rem 0;
+}
+.imgcontainer {
+  margin: 0 auto;
+  height: 300px;
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgb(146, 143, 143), rgba(0, 0, 0, 0.356));
+  position: relative;
+  border-radius: 100%;
+  box-shadow: 3px 3px 8px black;
+}
+.imgcontainer img {
+  height: 300px;
+  width: 300px;
+  position: absolute;
+}
+.smain p {
+  max-width: 700px;
+  text-align: center;
+}
+footer {
+  align-items: center;
+  height: 40vh;
+  display: flex;
+  justify-content: space-around;
+  background: linear-gradient(to right, #2d2d2dd3, #3b3c3c);
+  color: white;
+}
+footer h1 {
+  color: white;
+}
+footer p {
+  max-width: 280px;
+}
+.continue {
+  margin: auto 0;
+}
+.containerr {
+  display: flex;
+  height: 560px;
+  width: 500px;
+  background: rgba(255, 255, 255, 0.073);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 30px;
+  border-radius: 20px;
+}
+.main {
+  position: absolute;
+  top: 7%;
+  left: 35%;
+  visibility: hidden;
+  transition: 0.4s all;
+}
+.open-popup {
+  visibility: visible;
+  top: 10%;
+}
+span {
+  font-weight: bold;
+}
+.continue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 550px;
+}
+button {
+  border: none;
+  outline: none;
+  margin: 0 30px;
+}
+.conttttt a {
+  text-decoration: none;
+  padding: 10px 20px;
+  background: linear-gradient(#333, #111);
+  color: white;
+  font-weight: bolder;
+  border-radius: 10px;
+  border: none;
+  margin-left:-30px;
+}
+.inst {
+  overflow: hidden;
+  overflow-y: scroll;
+}
+.inst p{
+  margin-bottom:15px;
 }

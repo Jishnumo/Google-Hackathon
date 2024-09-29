@@ -64,7 +64,7 @@ function stopCamera() {
 }
 
 async function analyzeEmotion() {
-    const apiKey = 'AIzaSyDYcB93cc4t_EcNeOHYbD9-eca1jIBX5wg'; // Replace with your actual API key
+    const apiKey = 'AIzaSyDqb1D_IhdyyYuFeCBlXP7aAYOiA9_P4NQ'; // Replace with your actual API key
     const apiURL = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
 
     const requestBody = {
@@ -83,10 +83,7 @@ async function analyzeEmotion() {
         ]
     };
 
-    console.log('Request Body:', JSON.stringify(requestBody)); // Log the request body
-
     try {
-        console.log('Sending image to API...');
         const apiResponse = await fetch(apiURL, {
             method: 'POST',
             body: JSON.stringify(requestBody),
@@ -94,18 +91,14 @@ async function analyzeEmotion() {
         });
 
         if (apiResponse.ok) {
-            console.log('API response received');
             const result = await apiResponse.json();
-            console.log('API Result:', result); // Log the result
             displayEmotionResult(result);
         } else {
             const errorText = await apiResponse.text(); // Get error details
-            console.error('Error:', apiResponse.status, apiResponse.statusText, errorText);
             document.getElementById('emotion-result').innerHTML = `Error analyzing the image. Status: ${apiResponse.status} - ${apiResponse.statusText}`;
         }
     } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('emotion-result').innerHTML = `There was an error connecting to the API. Error: ${error.message}`;
+        document.getElementById('emotion-result').innerHTML = `Error: ${error.message}`;
     }
 }
 
@@ -124,7 +117,6 @@ function displayEmotionResult(result) {
     }
 }
 
-// Restart button functionality
 document.getElementById('restart').addEventListener('click', function() {
     document.getElementById('result-section').style.display = 'none';
     document.getElementById('consent-section').style.display = 'block';
