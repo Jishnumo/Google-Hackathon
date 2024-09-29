@@ -53,7 +53,7 @@ function captureImage() {
 
     document.getElementById('photo-section').style.display = 'none';
     document.getElementById('result-section').style.display = 'block';
-    analyzeEmotion();
+    analyzeEmotion();  // Send the image to the backend for emotion analysis
 }
 
 function stopCamera() {
@@ -64,30 +64,11 @@ function stopCamera() {
 }
 
 async function analyzeEmotion() {
-    const apiKey = 'AIzaSyDqb1D_IhdyyYuFeCBlXP7aAYOiA9_P4NQ'; // Replace with your actual API key
-    const apiURL = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
-
-    const requestBody = {
-        requests: [
-            {
-                image: {
-                    content: capturedImage // Pass the base64 data
-                },
-                features: [
-                    {
-                        type: 'FACE_DETECTION',
-                        maxResults: 1
-                    }
-                ]
-            }
-        ]
-    };
-
     try {
-        const apiResponse = await fetch(apiURL, {
+        const apiResponse = await fetch('/api/detect_emotion', {  // Flask endpoint
             method: 'POST',
-            body: JSON.stringify(requestBody),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: capturedImage })  // Send the base64 image
         });
 
         if (apiResponse.ok) {
@@ -104,17 +85,8 @@ async function analyzeEmotion() {
 
 function displayEmotionResult(result) {
     const resultDiv = document.getElementById('emotion-result');
-    
-    if (result.responses && result.responses[0].faceAnnotations && result.responses[0].faceAnnotations.length > 0) {
-        const face = result.responses[0].faceAnnotations[0];
-        resultDiv.innerHTML = `Detected emotions:`;
-        resultDiv.innerHTML += `<br> Joy: ${face.joyLikelihood}`;
-        resultDiv.innerHTML += `<br> Sorrow: ${face.sorrowLikelihood}`;
-        resultDiv.innerHTML += `<br> Anger: ${face.angerLikelihood}`;
-        resultDiv.innerHTML += `<br> Surprise: ${face.surpriseLikelihood}`;
-    } else {
-        resultDiv.innerHTML = `No face detected in the image.`;
-    }
+    resultDiv.innerHTML = `Detected emotion: ${result.emotion}`;
+    resultDiv.innerHTML += `<br> Recommendation: ${result.recommendation}`;
 }
 
 document.getElementById('restart').addEventListener('click', function() {
