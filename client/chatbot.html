@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Monitor</title>
+    <link rel="stylesheet" href="chatbot.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mental Health Monitor</h1>
+        <p>This system helps monitor your mental health by analyzing your emotions through a video recording. Please provide your consent before proceeding.</p>
+
+        <div id="consent-section">
+            <h2>Consent Form</h2>
+            <p>Do you allow us to record your video for emotional analysis?</p>
+
+            <button id="consent-allow" class="consent-btn">Allow</button>
+            <button id="consent-deny" class="consent-btn deny-btn">Deny</button>
+        </div>
+
+        <div id="video-section" style="display:none;">
+            <h2>Recording Video...</h2>
+            <p>We are now recording your video for analysis. Please stay still and maintain a neutral face if possible.</p>
+
+            <video id="video" width="320" height="240" autoplay muted></video>
+            <button id="stop-recording" class="consent-btn">Stop Recording</button>
+        </div>
+
+        <div id="result-section" style="display:none;">
+            <h2>Emotion Analysis</h2>
+            <p>Gemini AI is analyzing your emotions...</p>
+            <div id="emotion-result"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

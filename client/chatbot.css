@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+p {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.consent-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.consent-btn:hover {
+    background-color: #45a049;
+}
+
+.deny-btn {
+    background-color: #f44336;
+}
+
+.deny-btn:hover {
+    background-color: #e53935;
+}
+
+video {
+    margin-top: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+}
+
+#emotion-result {
+    margin-top: 20px;
+    font-size: 1.3em;
+    color: #333;
+}
