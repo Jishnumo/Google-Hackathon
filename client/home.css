@@ -210,8 +210,12 @@ button {
   font-weight: bolder;
   border-radius: 10px;
   border: none;
+  margin-left:-30px;
 }
 .inst {
   overflow: hidden;
   overflow-y: scroll;
+}
+.inst p{
+  margin-bottom:15px;
 }
