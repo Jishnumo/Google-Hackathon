@@ -3,34 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Health Monitor</title>
+    <title>Emotion Detection</title>
     <link rel="stylesheet" href="chatbot.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Mental Health Monitor</h1>
-        <p>This system helps monitor your mental health by analyzing your emotions through a video recording. Please provide your consent before proceeding.</p>
-
+    <div id="container">
         <div id="consent-section">
-            <h2>Consent Form</h2>
-            <p>Do you allow us to record your video for emotional analysis?</p>
+            <h1>Welcome to Emotion Detection</h1>
+            <p>This application uses facial recognition to analyze your emotions. Please review the following consent before proceeding:</p>
 
-            <button id="consent-allow" class="consent-btn">Allow</button>
-            <button id="consent-deny" class="consent-btn deny-btn">Deny</button>
+            <ul>
+                <li>Your photo will be used only for emotion analysis within this application.</li>
+                <li>We will not store or share your photo with any third parties.</li>
+                <li>You can withdraw your consent at any time.</li>
+            </ul>
+
+            <div class="consent-checkbox">
+                <input type="checkbox" id="consent-photo" required>
+                <label for="consent-photo">I consent to the capture and use of my photo for emotion detection.</label>
+            </div>
+
+            <div class="consent-checkbox">
+                <input type="checkbox" id="consent-terms" required>
+                <label for="consent-terms">I have read and agree to the <a href="#">Terms of Service</a>.</label>
+            </div>
+
+            <button id="consent-allow">Allow</button>
+            <button id="consent-deny">Deny</button>
         </div>
 
-        <div id="video-section" style="display:none;">
-            <h2>Recording Video...</h2>
-            <p>We are now recording your video for analysis. Please stay still and maintain a neutral face if possible.</p>
-
+        <div id="photo-section" style="display: none;">
+            <h2>Capture Your Photo</h2>
             <video id="video" width="320" height="240" autoplay muted></video>
-            <button id="stop-recording" class="consent-btn">Stop Recording</button>
+            <button id="capture-photo">Capture Photo</button>
+            <canvas id="canvas" style="display: none;"></canvas>
         </div>
 
-        <div id="result-section" style="display:none;">
-            <h2>Emotion Analysis</h2>
-            <p>Gemini AI is analyzing your emotions...</p>
+        <div id="result-section" style="display: none;">
+            <h2>Emotion Analysis Results</h2>
             <div id="emotion-result"></div>
+            <button id="restart">Restart</button>
         </div>
     </div>
 
