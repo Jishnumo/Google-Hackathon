@@ -59,7 +59,7 @@ def plot_history(history):
     plt.show()
 
 # Main
-data_dir = "./data"  # Replace with your dataset path
+data_dir = "data/"  # Replace with your dataset path
 
 # Load and preprocess the dataset
 images, labels = load_dataset(data_dir)

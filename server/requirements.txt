@@ -1,5 +1,6 @@
 Flask==2.2.2
 DeepFace==0.0.79
-tensorflow==2.9.0
+tensorflow
 firebase-admin==5.2.0
 opencv-python==4.6.0.66
+keras
