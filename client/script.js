@@ -53,7 +53,7 @@ function captureImage() {
 
     document.getElementById('photo-section').style.display = 'none';
     document.getElementById('result-section').style.display = 'block';
-    sendToGemini();
+    sendImageToBackend(); // Send image to backend
 }
 
 function stopCamera() {
@@ -63,32 +63,20 @@ function stopCamera() {
     }
 }
 
-// Send the image and prompt to the backend for processing by the Gemini API
-async function sendToGemini() {
-    const promptText = document.getElementById('prompt').value;
-
-    if (!promptText) {
-        alert("Please enter a prompt.");
-        return;
-    }
-
-    const requestBody = {
-        image: capturedImage,
-        prompt: promptText
-    };
-
+// Send the captured image to the backend
+async function sendImageToBackend() {
     try {
-        const response = await fetch('http://localhost:3000/analyze-prompt', {
+        const response = await fetch('/process-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify({ image: capturedImage })
         });
 
         if (response.ok) {
             const result = await response.json();
             displayGeminiResult(result);
         } else {
-            document.getElementById('gemini-result').innerHTML = `Error analyzing the image: ${response.statusText}`;
+            document.getElementById('gemini-result').innerHTML = `Error processing the image: ${response.statusText}`;
         }
     } catch (error) {
         document.getElementById('gemini-result').innerHTML = `Error: ${error.message}`;

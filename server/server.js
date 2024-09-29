@@ -1,48 +1,75 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const { GoogleGenerativeAI, GoogleAIFileManager } = require('@google/generative-ai');
 
 const app = express();
 app.use(bodyParser.json({ limit: '10mb' })); // Handle large image files
 
+const apiKey = process.env.GEMINI_API_KEY; // Set your Gemini API key here
+const genAI = new GoogleGenerativeAI(apiKey);
+const fileManager = new GoogleAIFileManager(apiKey);
 
-app.get("/", (req, res) => {
-    res.send("<h2> backend is running...</h2>");
-  });
-  
-// Route for analyzing text prompt and returning the Gemini response
-app.post('/analyze-prompt', async (req, res) => {
-    const { prompt } = req.body;
-    const apiKey = 'AIzaSyDqb1D_IhdyyYuFeCBlXP7aAYOiA9_P4NQ';  // Replace with your actual API key
-    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-
-    const requestBody = {
-        contents: [
-            {
-                parts: [
-                    {
-                        text: prompt // Send the text prompt to Gemini
-                    }
-                ]
-            }
-        ]
-    };
+// Handle file uploads and interactions with the Gemini API
+app.post('/process-image', async (req, res) => {
+    const { image } = req.body;
 
     try {
-        // Send the POST request to the Gemini API using Axios
-        const apiResponse = await axios.post(apiURL, requestBody, {
-            headers: { 'Content-Type': 'application/json' }
+        // Step 1: Save the image locally (Base64 -> File)
+        const base64Data = image.replace(/^data:image\/png;base64,/, ""); // Remove the Base64 header
+        const imagePath = path.join(__dirname, 'uploaded_image.png'); // Save the image locally
+        fs.writeFileSync(imagePath, base64Data, 'base64');
+
+        // Step 2: Upload the image to Gemini
+        const uploadedFile = await fileManager.uploadFile(imagePath, {
+            mimeType: 'image/png',
+            displayName: 'Uploaded Image',
         });
 
-        // If the response from the API is successful, send the result to the client
-        if (apiResponse.status === 200) {
-            res.json({ generatedContent: apiResponse.data.candidates[0].text });
-        } else {
-            res.status(apiResponse.status).send(apiResponse.statusText);
-        }
+        console.log(`Uploaded file as: ${uploadedFile.uri}`);
+
+        // Step 3: Start a chat session with the Gemini model
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const generationConfig = {
+            temperature: 1,
+            topP: 0.95,
+            topK: 64,
+            maxOutputTokens: 8192,
+            responseMimeType: 'text/plain',
+        };
+
+        const chatSession = model.startChat({
+            generationConfig,
+            history: [
+                {
+                    role: 'user',
+                    parts: [{ text: 'Please analyze the following image and provide a description.' }],
+                },
+                {
+                    role: 'user',
+                    parts: [
+                        {
+                            fileData: {
+                                mimeType: uploadedFile.mimeType,
+                                fileUri: uploadedFile.uri,
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // Step 4: Send the request to the Gemini API
+        const result = await chatSession.sendMessage("Describe the image I just uploaded.");
+        const generatedText = result.response.text();
+
+        // Step 5: Send the result back to the frontend
+        res.json({ generatedContent: generatedText });
+
     } catch (error) {
-        console.error('Error processing the prompt:', error.message);
-        res.status(500).send('Error processing the prompt: ' + error.message);
+        console.error('Error processing the image or generating content:', error);
+        res.status(500).send('Error processing the image or generating content.');
     }
 });
 
