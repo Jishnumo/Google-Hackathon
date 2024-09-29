@@ -110,8 +110,11 @@ a.login:hover {
   justify-content: center;
 }
 .ww {
-  padding: 60px 0;
+  padding: 40px 0;
   text-align: center;
+}
+.description{
+  margin:20px;
 }
 .services h1 {
   text-align: center;
