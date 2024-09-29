@@ -39,21 +39,18 @@ function captureImage() {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    // Set the canvas dimensions to match the video
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
 
-    // Draw the video frame to the canvas
     context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-    // Get the captured image data as a base64 string
-    capturedImage = canvas.toDataURL('image/png').split(',')[1]; // Get only the base64 data
+    capturedImage = canvas.toDataURL('image/png').split(',')[1]; 
 
     stopCamera();
 
     document.getElementById('photo-section').style.display = 'none';
     document.getElementById('result-section').style.display = 'block';
-    sendImageToBackend(); // Send image to backend
+    sendImageToBackend(); 
 }
 
 function stopCamera() {
@@ -63,7 +60,6 @@ function stopCamera() {
     }
 }
 
-// Send the captured image to the backend
 async function sendImageToBackend() {
     try {
         const response = await fetch('/process-image', {
@@ -83,7 +79,6 @@ async function sendImageToBackend() {
     }
 }
 
-// Display the Gemini API response
 function displayGeminiResult(result) {
     const resultDiv = document.getElementById('gemini-result');
     resultDiv.innerHTML = `Gemini Response: <br> ${result.generatedContent}`;

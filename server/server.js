@@ -2,7 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const { GoogleGenerativeAI, GoogleAIFileManager } = require('@google/generative-ai');
+const {
+    GoogleGenerativeAI,
+    GoogleAIFileManager
+} = require('@google/generative-ai');
 
 const app = express();
 app.use(bodyParser.json({ limit: '10mb' })); // Handle large image files
@@ -10,6 +13,16 @@ app.use(bodyParser.json({ limit: '10mb' })); // Handle large image files
 const apiKey = process.env.GEMINI_API_KEY; // Set your Gemini API key here
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
+
+// Upload the given file to Gemini
+async function uploadToGemini(filePath, mimeType) {
+    const uploadResult = await fileManager.uploadFile(filePath, {
+        mimeType,
+        displayName: path.basename(filePath),
+    });
+    console.log(`Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.name}`);
+    return uploadResult.file;
+}
 
 // Handle file uploads and interactions with the Gemini API
 app.post('/process-image', async (req, res) => {
@@ -22,12 +35,7 @@ app.post('/process-image', async (req, res) => {
         fs.writeFileSync(imagePath, base64Data, 'base64');
 
         // Step 2: Upload the image to Gemini
-        const uploadedFile = await fileManager.uploadFile(imagePath, {
-            mimeType: 'image/png',
-            displayName: 'Uploaded Image',
-        });
-
-        console.log(`Uploaded file as: ${uploadedFile.uri}`);
+        const uploadedFile = await uploadToGemini(imagePath, 'image/png');
 
         // Step 3: Start a chat session with the Gemini model
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -44,10 +52,6 @@ app.post('/process-image', async (req, res) => {
             history: [
                 {
                     role: 'user',
-                    parts: [{ text: 'Please analyze the following image and provide a description.' }],
-                },
-                {
-                    role: 'user',
                     parts: [
                         {
                             fileData: {
@@ -61,7 +65,7 @@ app.post('/process-image', async (req, res) => {
         });
 
         // Step 4: Send the request to the Gemini API
-        const result = await chatSession.sendMessage("Describe the image I just uploaded.");
+        const result = await chatSession.sendMessage("Identify the emotion in this image");
         const generatedText = result.response.text();
 
         // Step 5: Send the result back to the frontend
