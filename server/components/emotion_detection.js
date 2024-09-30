@@ -1,17 +1,43 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const upload = require('./upload'); // Multer middleware
+const { GoogleAIFileManager } = require('@google/generative-ai/server');
+const upload = require('./upload'); // Multer middleware for file handling
+const fs = require('fs');
 
 // Google Generative AI initialization
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
+const fileManager = new GoogleAIFileManager(apiKey);
+
+/**
+ * Uploads the given file to Google Gemini.
+ */
+async function uploadToGemini(path, mimeType) {
+  try {
+    const uploadResult = await fileManager.uploadFile(path, {
+      mimeType,
+      displayName: path,
+    });
+    const file = uploadResult.file;
+    console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
+    return file;
+  } catch (error) {
+    console.error("Error uploading file to Gemini: ", error);
+    throw error;
+  }
+}
 
 // Route to handle file upload and Google Generative AI processing
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { prompt } = req.body;
     const filePath = req.file.path; // Get the local file path saved by multer
+    const mimeType = req.file.mimetype; // Get the MIME type of the uploaded image
+
+    // Upload the image to Google Gemini
+    const uploadedFile = await uploadToGemini(filePath, mimeType);
 
     // Google Generative AI model configuration
     const model = genAI.getGenerativeModel({
@@ -26,7 +52,7 @@ router.post('/', upload.single('file'), async (req, res) => {
       responseMimeType: 'application/json',
     };
 
-    // Simulating how to upload to AI - change this as per actual implementation
+    // Set up the conversation history with the file's URI and MIME type
     const chatSession = model.startChat({
       generationConfig,
       history: [
@@ -35,25 +61,28 @@ router.post('/', upload.single('file'), async (req, res) => {
           parts: [
             {
               fileData: {
-                mimeType: req.file.mimetype, // Using the file's MIME type
-                fileUri: filePath,           // File path from multer
+                mimeType: uploadedFile.mimeType, // Use the uploaded file's MIME type
+                fileUri: uploadedFile.uri, // Use the uploaded file's URI
               },
             },
-            { text: prompt || 'Analyze this image' }, // Pass prompt if available
+            { text: prompt || 'Please analyze the emotion in this image.' },
           ],
         },
       ],
     });
 
     // Send message to AI model and get response
-    const result = await chatSession.sendMessage(prompt || 'Analyze image content');
+    const result = await chatSession.sendMessage(prompt || 'Analyze the emotion in this image.');
     const responseText = result.response.text();
 
     // Send back the result
     res.status(200).json({ message: responseText });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error during AI conversation: ', error);
     res.status(500).json({ error: 'An error occurred while processing your request.' });
+  } finally {
+    // Cleanup: Delete the uploaded file after processing
+    fs.unlinkSync(filePath); // Deletes the file from the server
   }
 });
 
