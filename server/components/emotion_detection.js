@@ -3,8 +3,8 @@ const router = express.Router();
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
-const upload = require('./upload'); // Multer middleware for file handling
 const fs = require('fs');
+const upload = require('./upload'); // Multer middleware for file handling
 
 // Google Generative AI initialization
 const apiKey = process.env.GEMINI_API_KEY;
@@ -14,11 +14,11 @@ const fileManager = new GoogleAIFileManager(apiKey);
 /**
  * Uploads the given file to Google Gemini.
  */
-async function uploadToGemini(path, mimeType) {
+async function uploadToGemini(filePath, mimeType) {
   try {
-    const uploadResult = await fileManager.uploadFile(path, {
+    const uploadResult = await fileManager.uploadFile(filePath, {
       mimeType,
-      displayName: path,
+      displayName: 'capture.png', // Fixed display name
     });
     const file = uploadResult.file;
     console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
@@ -33,7 +33,7 @@ async function uploadToGemini(path, mimeType) {
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { prompt } = req.body;
-    const filePath = req.file.path; // Get the local file path saved by multer
+    const filePath = path.join(__dirname, '../uploads/capture.png'); // Fixed path to 'capture.png'
     const mimeType = req.file.mimetype; // Get the MIME type of the uploaded image
 
     // Upload the image to Google Gemini
@@ -80,9 +80,6 @@ router.post('/', upload.single('file'), async (req, res) => {
   } catch (error) {
     console.error('Error during AI conversation: ', error);
     res.status(500).json({ error: 'An error occurred while processing your request.' });
-  } finally {
-    // Cleanup: Delete the uploaded file after processing
-    fs.unlinkSync(filePath); // Deletes the file from the server
   }
 });
 
