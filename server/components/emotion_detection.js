@@ -81,7 +81,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Send message to AI model and get response
     const result = await chatSession.sendMessage(prompt || 'Analyze the emotion in this image.');
     const responseText = result.response.text();
-    console.log("Response: ",  result.response.json); // Debug response
+    console.log("Response: ",  result.response); // Debug response
 
     // Send back the result
     res.status(200).json({ message: responseText });
