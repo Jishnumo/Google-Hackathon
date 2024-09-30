@@ -61,7 +61,7 @@ const EmotionDetection = () => {
   const sendToBackend = async (imageBlob) => {
     setLoading(true); // Set loading to true
     const formData = new FormData();
-    formData.append("file", imageBlob, "captured.png"); // Append image as file
+    formData.append("file", imageBlob, "capture.png"); // Append image as file
     formData.append("prompt", "Analyze the emotions in this image");
 
     try {
