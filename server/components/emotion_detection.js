@@ -7,7 +7,7 @@ const fs = require('fs');
 const upload = require('./upload'); // Multer middleware for file handling
 
 // Google Generative AI initialization
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
