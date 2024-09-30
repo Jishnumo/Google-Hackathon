@@ -1,16 +1,15 @@
 const multer = require('multer');
 
-// Multer configuration: Temporarily store files in 'uploads' folder
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Save files to 'uploads' folder
+    cb(null, 'uploads/'); 
   },
   filename: function (req, file, cb) {
-    cb(null, `${file.originalname}`); // Ensure unique filenames
+    cb(null, `${file.originalname}`);
   },
 });
 
-// Filter to accept only image files
+
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -19,7 +18,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Set upload configuration
+//? Set upload configuration
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,

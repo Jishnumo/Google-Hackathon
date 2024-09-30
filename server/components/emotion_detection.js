@@ -11,9 +11,7 @@ const apiKey = process.env.API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
-/**
- * Uploads the given file to Google Gemini.
- */
+
 async function uploadToGemini(filePath, mimeType) {
   try {
     console.log(`Attempting to upload file: ${filePath}`); // Log file path
@@ -30,12 +28,12 @@ async function uploadToGemini(filePath, mimeType) {
   }
 }
 
-// Route to handle file upload and Google Generative AI processing
+//! Route to handle file upload and Google Generative AI processing
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { prompt } = req.body;
-    const filePath = path.join(__dirname, '../uploads/capture.png'); // Fixed path to 'capture.png'
-    const mimeType = req.file.mimetype; // Get the MIME type of the uploaded image
+    const filePath = path.join(__dirname, '../uploads/capture.png'); 
+    const mimeType = req.file.mimetype;
 
     // Check if the file exists before processing
     if (!fs.existsSync(filePath)) {
@@ -83,6 +81,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Send message to AI model and get response
     const result = await chatSession.sendMessage(prompt || 'Analyze the emotion in this image.');
     const responseText = result.response.text();
+    console.log("Response: ",  result.response.json); // Debug response
 
     // Send back the result
     res.status(200).json({ message: responseText });
