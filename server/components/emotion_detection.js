@@ -16,6 +16,7 @@ const fileManager = new GoogleAIFileManager(apiKey);
  */
 async function uploadToGemini(filePath, mimeType) {
   try {
+    console.log(`Attempting to upload file: ${filePath}`); // Log file path
     const uploadResult = await fileManager.uploadFile(filePath, {
       mimeType,
       displayName: 'capture.png', // Fixed display name
@@ -35,6 +36,14 @@ router.post('/', upload.single('file'), async (req, res) => {
     const { prompt } = req.body;
     const filePath = path.join(__dirname, '../uploads/capture.png'); // Fixed path to 'capture.png'
     const mimeType = req.file.mimetype; // Get the MIME type of the uploaded image
+
+    // Check if the file exists before processing
+    if (!fs.existsSync(filePath)) {
+      console.error("File does not exist: " + filePath);
+      return res.status(400).json({ error: 'File not found: capture.png' });
+    }
+
+    console.log("File path: ", filePath); // Debug file path
 
     // Upload the image to Google Gemini
     const uploadedFile = await uploadToGemini(filePath, mimeType);
