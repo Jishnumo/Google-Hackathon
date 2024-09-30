@@ -13,15 +13,6 @@ body {
   background-color: #f4f4f9;
 }
 
-nav {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  margin: 20px;
-  padding: 0 50px;
-  position: absolute;
-}
-
 li {
   display: inline;
 }
