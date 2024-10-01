@@ -1,48 +1,64 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import bgimg from "../assets/StartBuilding_001_BG.png";
+import animationData from "../assets/StartBuilding_001.json";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 const Home = () => {
+  const lottieRef = useRef(null);
   const navigate = useNavigate();
 
-  const openPopup = () => {
-    const popup = document.getElementById("contt");
-    popup.classList.add("open-popup");
+  const handleButtonClick = () => {
+    lottieRef.current.play(); // Play the animation on button click
+  };
+
+  const handleAnimationComplete = () => {
+    navigate("/start"); // Navigate to the desired route after animation completes
   };
 
   return (
-    <section className="home">
-      <h1 className="title">Healio.ai</h1>
-      <div className="mmmm">
-        <button className="btn" type="button" onClick={openPopup}>
-          Start Now
-        </button>
-        <div className="main" id="contt">
-          <div className="containerr">
-            <div className="continue">
-              <div className="cont"></div>
-            </div>
-            <div className="inst">
-              <h1>INSTRUCTIONS</h1>
-              <p>
-                <span>Ensure Legibility:</span> Make sure the exam paper is clear and legible...
-                <span>Use Standard Formats:</span> Upload the exam paper in a standard digital format such as PDF or image files (JPEG, PNG, etc.). Ensure that the entire paper is visible and not cropped or cut off. <br />
-                <span>Single Document Upload:</span> Upload one exam paper at a time. Avoid uploading multiple papers simultaneously to prevent confusion and ensure accurate processing. <br />
-                <span>Check for Completeness:</span> Verify that all pages of the exam paper are included in the upload. Missing pages can lead to incomplete grading. <br />
-                <span>Follow Naming Conventions:</span> If there are specific naming conventions or instructions for naming the files, adhere to them. This helps in organizing and processing the uploaded papers efficiently. <br />
-                <span>Review Guidelines:</span> Familiarize yourself with any specific guidelines or requirements provided by the automatic exam paper checker. Follow these guidelines to ensure smooth processing and accurate results.<br />
-                <span>Privacy and Security:</span> Be mindful of any sensitive information present on the exam paper, such as student names or identification numbers. Ensure that such information is appropriately redacted or anonymized before uploading. <br />
-                <span>Submit Corrections:</span> If any errors are identified after uploading, follow the designated procedure for submitting corrections or revisions. This may involve re-uploading the corrected version of the exam paper. <br />
-                <span>Patience During Processing:</span> Understand that the automatic exam paper checker may take some time to process and grade the uploaded papers, especially during peak periods. Be patient and wait for the results to be generated. <br />
-                <span>Contact Support if Needed:</span> If you encounter any technical issues or have questions about the uploading process, don't hesitate to contact customer support for assistance.
-              </p>
-              <button className="conttttt">
-                <a href="/emotion-detection">Continue</a>
-              </button>
-            </div>
+    <div className="relative block w-full h-screen">
+      <div className="flex justify-center items-center font-gsd h-screen sticky top-0 left-0 w-full">
+        <div className="absolute inset-0 w-full h-screen overflow-hidden">
+          <div className="w-calc-100plus300 md:w-full max-w-[initial]">
+            {/* Lottie Animation */}
+            <Player
+              ref={lottieRef}
+              src={animationData}
+              style={{
+                position: "absolute",
+                top: "50%",
+                transform: "translate3d(0,-50%,0)",
+              }}
+              speed={1}
+              loop={false} // Set loop to false to play the animation once
+              onComplete={handleAnimationComplete} // Trigger navigation on complete
+            />
+            <img
+              src={bgimg}
+              alt="Line background"
+              loading="lazy"
+              height="500"
+              className="absolute top-1/2 left-0 -translate-y-1/2 w-full"
+            />
           </div>
         </div>
+        <div className="flex flex-col relative items-center justify-center  z-10 px-6">
+          <div className="flex flex-col items-center gap-5 text-center">
+            <h1 className="text-6xl font-bold text-[#c418e6e9]">Healio.ai</h1>
+            <p className="text-[#929DAB] text-xl leading-[120%] max-w-[640px] md:max-w-[705px] px-9">
+              Your AI Companion for Mindful Living and Emotional Wellness
+            </p>
+          </div>
+          <button
+            className="mt-10 bg-violet-600 text-white text-lg font-medium py-3 px-6 rounded-full hover:bg-violet-600 transition"
+            onClick={handleButtonClick}
+          >
+            Start Now
+          </button>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 

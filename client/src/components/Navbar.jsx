@@ -11,8 +11,8 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white border-b w-full md:static md:text-sm md:border-none">
-      <div className="items-center px-4 max-w-screen-xl mx-auto md:flex md:px-8">
+    <nav className="fixed bg-white border-b w-full md:fixed md:text-base md:border-none">
+      <div className="items-center px-4 max-w-screen-2xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between py-3 md:py-5 md:block">
           <Link to="/">
             <img
@@ -64,9 +64,9 @@ const Navbar = () => {
             state ? 'block' : 'hidden'
           }`}
         >
-          <ul className="justify-end items-center space-y-6 md:flex md:space-x-6 md:space-y-0">
+          <ul className="font-semibold justify-end items-center space-y-6 md:flex md:space-x-6 md:space-y-0">
             {navigation.map((item, idx) => (
-              <li key={idx} className="text-gray-700 hover:text-indigo-600">
+              <li key={idx} className=" text-gray-700 hover:text-violet-600">
                 <Link to={item.path} className="block">
                   {item.title}
                 </Link>
@@ -74,18 +74,18 @@ const Navbar = () => {
             ))}
             <span className="hidden w-px h-6 bg-gray-300 md:block"></span>
             <div className="space-y-3 items-center gap-x-6 md:flex md:space-y-0">
-              <li>
+              {/* <li>
                 <Link
                   to="/chatbot"
-                  className="block py-3 text-center text-gray-700 hover:text-indigo-600 border rounded-lg md:border-none"
+                  className="block py-3 text-center text-gray-700 hover:text-violet-600 border rounded-lg md:border-none"
                 >
                   <i className="fa-solid fa-right-to-bracket"></i> Chatbot
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <a
                   href="javascript:void(0)"
-                  className="block py-3 px-4 font-medium text-center text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 active:shadow-none rounded-lg shadow md:inline"
+                  className="block py-3 px-4 font-medium text-center text-lime-50 bg-violet-600 hover:bg-violet-600 active:bg-violet-600 active:shadow-none rounded-lg shadow md:inline"
                 >
                   Sign In
                 </a>
