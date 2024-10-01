@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import navlogo from "../assets/healio.png"
+
 const Navbar = () => {
   const [state, setState] = useState(false);
 
@@ -11,12 +13,12 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed bg-white border-b w-full md:fixed md:text-base md:border-none">
+    <nav className="fixed  bg-violet-600 backdrop-blur-sm w-full md:fixed md:text-base md:border-none">
       <div className="items-center px-4 max-w-screen-2xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between py-3 md:py-5 md:block">
           <Link to="/">
             <img
-              src="https://www.floatui.com/logo.svg"
+              src={navlogo}
               width={120}
               height={50}
               alt="Logo"
@@ -66,7 +68,7 @@ const Navbar = () => {
         >
           <ul className="font-semibold justify-end items-center space-y-6 md:flex md:space-x-6 md:space-y-0">
             {navigation.map((item, idx) => (
-              <li key={idx} className=" text-gray-700 hover:text-violet-600">
+              <li key={idx} className=" text-yellow-200 hover:text-violet-600">
                 <Link to={item.path} className="block">
                   {item.title}
                 </Link>
