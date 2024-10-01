@@ -9,7 +9,7 @@ const Footer = () => {
       </div>
       <div className="team">
         <h2>TEAM</h2>
-        Jishnu Mohan <br /> Justin James <br /> Tom Sabu <br /> Joe Gisto
+        Jishnu Mohan <br /> Joe Gisto <br /> Tom Sabu <br /> Justin James 
       </div>
       <div className="social">
         <h2>CONNECT WITH US</h2>
