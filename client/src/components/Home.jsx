@@ -9,11 +9,17 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    lottieRef.current.play(); 
+    lottieRef.current.play(); // Play the animation on button click
+
+    // Fallback timeout in case `onComplete` doesn't fire
+    setTimeout(() => {
+      console.log("Timeout triggered. Navigating to /chatbot");
+      navigate("/chatbot");
+    }, 2000); // Adjust this duration based on the length of your animation
   };
 
   const handleAnimationComplete = () => {
-    navigate("/start");
+    navigate("/emotion-detection"); // Navigate to '/chatbot' after the animation completes
   };
 
   return (
