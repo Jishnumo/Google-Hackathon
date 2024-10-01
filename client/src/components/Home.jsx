@@ -9,11 +9,11 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    lottieRef.current.play(); // Play the animation on button click
+    lottieRef.current.play(); 
   };
 
   const handleAnimationComplete = () => {
-    navigate("/start"); // Navigate to the desired route after animation completes
+    navigate("/start");
   };
 
   return (
