@@ -19,7 +19,7 @@ const App = () => {
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/emotion-detection" element={<EmotionDetection />} />
       </Routes>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 };
