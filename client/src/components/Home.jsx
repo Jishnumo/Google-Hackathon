@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import bgimg from "../assets/StartBuilding_001_BG.png";
+import logo from "../assets/healio.png";
 import animationData from "../assets/StartBuilding_001.json";
 import { Player } from "@lottiefiles/react-lottie-player";
 
@@ -51,7 +52,7 @@ const Home = () => {
         </div>
         <div className="flex flex-col relative items-center justify-center  z-10 px-6">
           <div className="flex flex-col items-center gap-5 text-center">
-            <h1 className="text-6xl font-bold text-[#c418e6e9]">Healio.ai</h1>
+            <img src={logo} alt="" width="300" height="200" />
             <p className="text-[#929DAB] text-xl leading-[120%] max-w-[640px] md:max-w-[705px] px-9">
               Your AI Companion for Mindful Living and Emotional Wellness
             </p>
