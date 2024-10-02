@@ -2,35 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import facescannobg from "../assets/facescannobg.gif";
 
-function Chatbot({ detectedEmotion }) {
+function Chatbot() {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Welcome! How can I assist you today?" },
   ]);
   const [userInput, setUserInput] = useState("");
-  const [showGif, setShowGif] = useState(true); // State to control GIF visibility
+  const [showGif, setShowGif] = useState(true);
+  const [detectedEmotion, setDetectedEmotion] = useState(""); // Store detected emotion
+
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    // Hide the navbar and logo of the previous page
-    const navbar = document.getElementById("navbar");
-    const logo = document.getElementById("logo");
-    if (navbar) {
-      navbar.style.display = "none"; // Hide navbar
-    }
-    if (logo) {
-      logo.style.display = "none"; // Hide logo
-    }
-
-    // Restore navbar and logo when component is unmounted
-    return () => {
-      if (navbar) {
-        navbar.style.display = "block";
-      }
-      if (logo) {
-        logo.style.display = "block";
-      }
-    };
-  }, []);
 
   useEffect(() => {
     // Automatically scroll to the bottom of chat when messages update
@@ -45,17 +25,32 @@ function Chatbot({ detectedEmotion }) {
       setShowGif(false);
     }, 6000); // 6 seconds for example
 
-    // If detectedEmotion is available, add a message based on it
-    if (detectedEmotion) {
-      const emotionMessage = `It seems you're feeling ${detectedEmotion}. How can I help you today?`;
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "bot", text: emotionMessage },
-      ]);
-    }
+    // Fetch emotion and chatbot response from backend after image analysis
+    getEmotionAndResponseFromBackend();
 
     return () => clearTimeout(timer); // Cleanup on component unmount
-  }, [detectedEmotion]);
+  }, []);
+
+  // Fetch emotion and chatbot response from backend after image analysis
+  const getEmotionAndResponseFromBackend = async () => {
+    try {
+      const response = await axios.post("/api/emotion-check");
+      if (response.status === 200) {
+        const { emotion, message } = response.data;
+        setDetectedEmotion(emotion); // Store detected emotion
+
+        // Add the initial emotion-based response to the chat
+        const initialResponse = `It seems you're feeling ${emotion}. How can I help you today?`;
+        setMessages([...messages, { sender: "bot", text: initialResponse }, { sender: "bot", text: message }]);
+      }
+    } catch (error) {
+      console.error("Error fetching emotion: ", error);
+      setMessages([
+        ...messages,
+        { sender: "bot", text: "Sorry, I couldn't detect your emotion." },
+      ]);
+    }
+  };
 
   // Handle sending a message
   const handleSendMessage = async () => {
@@ -66,6 +61,7 @@ function Chatbot({ detectedEmotion }) {
     setMessages(newMessages);
 
     try {
+      // Send user's message to backend and get AI-generated response
       const response = await axios.post("/api/chatbot", { message: userInput });
       const botResponse = response.data.reply;
 
@@ -94,11 +90,7 @@ function Chatbot({ detectedEmotion }) {
       {/* Face ID Animation at the top, visible only if showGif is true */}
       {showGif && (
         <div className="absolute top-0 w-full flex justify-center pt-4">
-          <img
-            src={facescannobg}
-            alt="Face ID Animation"
-            className="w-20 h-20"
-          />
+          <img src={facescannobg} alt="Face ID Animation" className="w-20 h-20" />
         </div>
       )}
 

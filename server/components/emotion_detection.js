@@ -8,10 +8,19 @@ const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const axios = require('axios');
 
 // Google Generative AI initialization
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 512,
+  responseMimeType: "text/plain",
+};
+
+// Upload image to Gemini
 async function uploadToGemini(filePath, mimeType) {
   try {
     console.log(`Attempting to upload file: ${filePath}`);
@@ -28,43 +37,12 @@ async function uploadToGemini(filePath, mimeType) {
   }
 }
 
-// Function to generate a random joke using a public API
-async function getRandomJoke() {
-  try {
-    const response = await axios.get('https://v2.jokeapi.dev/joke/Any');
-    if (response.data.type === 'single') {
-      return response.data.joke; // Joke is a single statement
-    } else {
-      return `${response.data.setup} - ${response.data.delivery}`; // Setup and delivery for two-part jokes
-    }
-  } catch (error) {
-    console.error("Error fetching joke:", error);
-    return "I couldn't think of a joke right now, but I'm here for you!";
-  }
-}
-
-// Function to generate a motivational quote
-async function getRandomQuote() {
-  const quotes = [
-    "Keep your face always toward the sunshine—and shadows will fall behind you. - Walt Whitman",
-    "The only way to do great work is to love what you do. - Steve Jobs",
-    "Believe you can and you're halfway there. - Theodore Roosevelt",
-    "Your limitation—it's only your imagination.",
-  ];
-  return quotes[Math.floor(Math.random() * quotes.length)];
-}
-
-// Function to generate a chatbot response based on emotion and context
+// Generate a chatbot response based on the emotion detected
 async function generateChatResponse(emotion, context) {
   const chatSession = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-1.5-pro',
   }).startChat({
-    generationConfig: {
-      temperature: 1,
-      topP: 0.95,
-      topK: 64,
-      maxOutputTokens: 512,
-    },
+    generationConfig,
     history: [
       {
         role: "user",
@@ -81,7 +59,7 @@ async function generateChatResponse(emotion, context) {
   return result.response.text();
 }
 
-// Route to handle file upload and Google Generative AI processing
+// Route to handle file upload, emotion detection, and chatbot response
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -93,20 +71,12 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'File not found: capture.png' });
     }
 
-    // Upload the image to Google Gemini
+    // Upload the image to Gemini for emotion detection
     const uploadedFile = await uploadToGemini(filePath, mimeType);
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
     });
-
-    const generationConfig = {
-      temperature: 1,
-      topP: 0.95,
-      topK: 64,
-      maxOutputTokens: 8192,
-      responseMimeType: 'application/json',
-    };
 
     const chatSession = model.startChat({
       generationConfig,
@@ -126,25 +96,22 @@ router.post('/', upload.single('file'), async (req, res) => {
       ],
     });
 
+    // Get emotion detection response from Gemini
     const result = await chatSession.sendMessage(prompt || 'Analyze the emotion in this image.');
-    const responseText = await result.response.text(); // Get response text
+    const emotionResponse = await result.response.text(); // Extract emotion response text
 
-    console.log("Emotion Detection Response: ", responseText); // Debug response
+    console.log("Emotion Detection Response: ", emotionResponse); // Debug response
 
     // Assuming the response contains the detected emotion
-    const detectedEmotion = extractEmotion(responseText); // Use a function to extract the actual emotion from the response
+    const detectedEmotion = 'happy'; // Replace this with the actual emotion extracted
 
-    // Call the generateChatResponse function to generate the chatbot response
-    const chatbotResponse = await generateChatResponse(detectedEmotion, responseText);
+    // Generate chatbot response based on detected emotion
+    const chatbotResponse = await generateChatResponse(detectedEmotion, emotionResponse);
 
-    // Optionally include a random joke or motivational quote
-    const randomJokeOrQuote = Math.random() < 0.5 ? await getRandomJoke() : await getRandomQuote();
-
-    // Send back the combined response
-    res.status(200).json({ 
-      emotion: detectedEmotion, 
-      message: chatbotResponse, 
-      extra: randomJokeOrQuote 
+    // Send back the chatbot response to the frontend
+    res.status(200).json({
+      emotion: detectedEmotion,
+      message: chatbotResponse,
     });
   } catch (error) {
     console.error('Error during AI conversation: ', error);
@@ -153,11 +120,3 @@ router.post('/', upload.single('file'), async (req, res) => {
 });
 
 module.exports = router;
-
-// Utility function to extract emotion from response text
-function extractEmotion(responseText) {
-  // Example: Simple logic to extract the emotion from the responseText
-  const emotionRegex = /(?:feeling|emotion\sis)\s(\w+)/i;
-  const match = responseText.match(emotionRegex);
-  return match ? match[1].toLowerCase() : "neutral"; // Default to "neutral" if no match
-}
