@@ -14,8 +14,8 @@ const Home = () => {
     // Fallback timeout in case `onComplete` doesn't fire
     setTimeout(() => {
       console.log("Timeout triggered. Navigating to /chatbot");
-      navigate("/emotion-detection");
-    }, 2000); // Adjust this duration based on the length of your animation
+      navigate("/chatbot");
+    }, 2500); // Adjust this duration based on the length of your animation
   };
 
   const handleAnimationComplete = () => {

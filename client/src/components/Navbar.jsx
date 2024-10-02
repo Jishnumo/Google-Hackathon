@@ -13,7 +13,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed  bg-violet-600 backdrop-blur-sm w-full md:fixed md:text-base md:border-none">
+    <nav className="fixed  w-full py-3 md:fixed md:text-base md:border-none">
       <div className="items-center px-4 max-w-screen-2xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between py-3 md:py-5 md:block">
           <Link to="/">

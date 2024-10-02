@@ -5,3 +5,8 @@
 ::-webkit-scrollbar{
     display: none;
 }
+
+body {
+    background: #000;
+    color: aliceblue;
+}
