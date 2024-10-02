@@ -60,8 +60,9 @@ async function detectEmotionFromImage(uploadedFile) {
   });
 
   try {
+    // Correct format for sendMessage, using only `text` parts for message
     const result = await chatSession.sendMessage({
-      parts: [{ text: 'Analyze the emotion in this image.' }],
+      text: 'Analyze the emotion in this image.',
     });
 
     const response = await result.response.text(); // Get response text
@@ -100,7 +101,7 @@ async function generateChatResponse(emotion) {
 
   try {
     const result = await chatSession.sendMessage({
-      parts: [{ text: `User is feeling: ${emotion}.` }],
+      text: `User is feeling: ${emotion}.`,
     });
 
     const responseText = await result.response.text();
