@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import facescannobg from "../assets/facescannobg.gif";
 
 function Chatbot() {
   const [messages, setMessages] = useState([
@@ -92,7 +93,14 @@ function Chatbot() {
           ))}
           <div ref={messagesEndRef} /> {/* Auto-scroll target */}
         </div>
-
+        {/* Add GIF above the chat */}
+        <div className="flex justify-center mt-4">
+          <img
+            src={facescannobg} // Replace with correct path
+            alt="Face ID Animation"
+            className="w-32 h-32" // Adjust width and height as needed
+          />
+        </div>
         {/* Input Area */}
         <div className="mb-10 flex items-center justify-between">
           <input
