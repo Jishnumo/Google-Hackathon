@@ -18,7 +18,7 @@ async function uploadToGemini(filePath, mimeType) {
     console.log(`Attempting to upload file: ${filePath}`);
     const uploadResult = await fileManager.uploadFile(filePath, {
       mimeType,
-      displayName: 'capture.png', // Fixed display name
+      displayName: 'capture.png',
     });
     const file = uploadResult.file;
     console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
@@ -29,7 +29,7 @@ async function uploadToGemini(filePath, mimeType) {
   }
 }
 
-// Function to handle emotion detection using the image uploaded
+// Emotion Detection Function
 async function detectEmotionFromImage(uploadedFile) {
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
@@ -64,14 +64,16 @@ async function detectEmotionFromImage(uploadedFile) {
       parts: [{ text: 'Analyze the emotion in this image.' }],
     });
 
-    return result.response.text(); // Get response text containing emotion
+    const response = await result.response.text(); // Get response text
+    console.log("Emotion Detection Response: ", response);
+    return response; // Return emotion as a string (adjust as needed based on API response)
   } catch (error) {
     console.error("Error during emotion detection: ", error);
     throw error;
   }
 }
 
-// Function to generate chatbot response based on the detected emotion
+// Chatbot Response Function
 async function generateChatResponse(emotion) {
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-pro',
@@ -101,7 +103,9 @@ async function generateChatResponse(emotion) {
       parts: [{ text: `User is feeling: ${emotion}.` }],
     });
 
-    return result.response.text();
+    const responseText = await result.response.text();
+    console.log("Chatbot Response: ", responseText);
+    return responseText;
   } catch (error) {
     console.error("Error during chatbot response generation: ", error);
     throw error;
@@ -113,9 +117,9 @@ async function getRandomJoke() {
   try {
     const response = await axios.get('https://v2.jokeapi.dev/joke/Any');
     if (response.data.type === 'single') {
-      return response.data.joke; // Joke is a single statement
+      return response.data.joke; // Single-line joke
     } else {
-      return `${response.data.setup} - ${response.data.delivery}`; // Setup and delivery for two-part jokes
+      return `${response.data.setup} - ${response.data.delivery}`; // Two-part joke
     }
   } catch (error) {
     console.error("Error fetching joke:", error);
@@ -134,10 +138,10 @@ async function getRandomQuote() {
   return quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-// Route to handle file upload and Google Generative AI processing
+// Route to handle file upload and AI processing
 router.post('/', upload.single('file'), async (req, res) => {
   try {
-    const filePath = path.join(__dirname, '../uploads/capture.png'); 
+    const filePath = path.join(__dirname, '../uploads/capture.png');
     const mimeType = req.file.mimetype;
 
     if (!fs.existsSync(filePath)) {
@@ -150,10 +154,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     // Detect the emotion from the image
     const emotionResponse = await detectEmotionFromImage(uploadedFile);
-    console.log("Emotion Detection Response: ", emotionResponse); // Debug response
-
-    // Assuming the response contains the detected emotion in JSON format
-    const detectedEmotion = JSON.parse(emotionResponse).emotion || 'neutral'; // Adjust as per the API response format
+    const detectedEmotion = JSON.parse(emotionResponse).emotion || 'neutral';
 
     // Generate the chatbot response based on the detected emotion
     const chatbotResponse = await generateChatResponse(detectedEmotion);
@@ -162,10 +163,10 @@ router.post('/', upload.single('file'), async (req, res) => {
     const randomJokeOrQuote = Math.random() < 0.5 ? await getRandomJoke() : await getRandomQuote();
 
     // Send back the combined response
-    res.status(200).json({ 
-      emotion: detectedEmotion, 
-      message: chatbotResponse, 
-      extra: randomJokeOrQuote 
+    res.status(200).json({
+      emotion: detectedEmotion,
+      message: chatbotResponse,
+      extra: randomJokeOrQuote
     });
   } catch (error) {
     console.error('Error during AI conversation: ', error);
