@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AccpectTerms from "./Accpect_terms"; 
 import Chatbot from "./Chatbot";
+import Capture from "./Caputer";
 
 const EmotionDetection = () => {
   const navigate = useNavigate();
@@ -33,7 +34,8 @@ const EmotionDetection = () => {
         <AccpectTerms onConsent={handleConsent} onDeny={handleDeny} />
       ) : (
         <>
-        <Chatbot/>
+        <Capture/>
+
         </>
       )}
     </div>
