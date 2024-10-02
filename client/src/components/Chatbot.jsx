@@ -92,7 +92,7 @@ function Chatbot() {
           <img
             src={facescannobg} // Replace with correct path
             alt="Face ID Animation"
-            className="w-16 h-16" // Adjust width and height as needed
+            className="w-20 h-20" // Adjust width and height as needed
           />
         </div>
       )}
