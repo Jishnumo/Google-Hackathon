@@ -152,22 +152,28 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Upload the image to Google Gemini for emotion detection
     const uploadedFile = await uploadToGemini(filePath, mimeType);
 
-    // Detect the emotion from the image
-    const emotionResponse = await detectEmotionFromImage(uploadedFile);
-    const detectedEmotion = JSON.parse(emotionResponse).emotion || 'neutral';
+    // Delay for emotion detection to complete
+    setTimeout(async () => {
+      // Detect the emotion from the image
+      const emotionResponse = await detectEmotionFromImage(uploadedFile);
+      const detectedEmotion = JSON.parse(emotionResponse).emotion || 'neutral';
 
-    // Generate the chatbot response based on the detected emotion
-    const chatbotResponse = await generateChatResponse(detectedEmotion);
+      // Delay chatbot response generation
+      setTimeout(async () => {
+        // Generate the chatbot response based on the detected emotion
+        const chatbotResponse = await generateChatResponse(detectedEmotion);
 
-    // Optionally include a random joke or motivational quote
-    const randomJokeOrQuote = Math.random() < 0.5 ? await getRandomJoke() : await getRandomQuote();
+        // Optionally include a random joke or motivational quote
+        const randomJokeOrQuote = Math.random() < 0.5 ? await getRandomJoke() : await getRandomQuote();
 
-    // Send back the combined response
-    res.status(200).json({
-      emotion: detectedEmotion,
-      message: chatbotResponse,
-      extra: randomJokeOrQuote
-    });
+        // Send back the combined response
+        res.status(200).json({
+          emotion: detectedEmotion,
+          message: chatbotResponse,
+          extra: randomJokeOrQuote,
+        });
+      }, 2000); // Adding a 2-second delay before generating chatbot response
+    }, 1000); // Adding a 1-second delay for emotion detection processing
   } catch (error) {
     console.error('Error during AI conversation: ', error);
     res.status(500).json({ error: 'An error occurred while processing your request.' });
