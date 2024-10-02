@@ -7,23 +7,22 @@ const Capture = () => {
   const videoRef = useRef(null); // Ref for video stream (hidden)
   const canvasRef = useRef(null); // Ref for canvas
   const mediaStreamRef = useRef(null); // Store the media stream
-  const [isVideoReady, setIsVideoReady] = useState(false); // Check if video is ready
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false); // Track if video is playing
 
   useEffect(() => {
     startCamera(); // Start the camera when the component mounts
 
-    // Automatically capture image after 5 seconds if the video is ready
     const timer = setTimeout(() => {
-      if (isVideoReady) {
-        captureImage();
+      if (isVideoPlaying) {
+        captureImage(); // Capture image once the video is playing
       }
-    }, 5000);
+    }, 5000); // Capture image after 5 seconds
 
     return () => {
       stopCamera(); // Clean up camera stream on unmount
       clearTimeout(timer); // Clear the timer on unmount
     };
-  }, [isVideoReady]);
+  }, [isVideoPlaying]); // Depend on the video being ready
 
   // Start the camera without showing the video
   const startCamera = () => {
@@ -34,9 +33,9 @@ const Capture = () => {
           mediaStreamRef.current = stream;
           videoRef.current.srcObject = stream;
 
-          // Listen for the video playing event to ensure it's ready for capture
-          videoRef.current.onloadedmetadata = () => {
-            setIsVideoReady(true); // Mark the video as ready
+          // Listen for the video to start playing
+          videoRef.current.onloadeddata = () => {
+            setIsVideoPlaying(true); // Mark the video as playing
           };
         })
         .catch((err) => {
@@ -62,23 +61,19 @@ const Capture = () => {
 
   // Capture an image from the video stream
   const captureImage = () => {
-    if (!isVideoReady) {
-      console.error("Video not ready for capture.");
-      return;
-    }
-
     const videoElement = videoRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
-    canvas.width = videoElement.videoWidth;
-    canvas.height = videoElement.videoHeight;
-
-    // Ensure the video is playing and ready before capturing the image
-    if (canvas.width === 0 || canvas.height === 0) {
-      console.error("Video stream is not available or not ready.");
+    // Ensure the video is loaded
+    if (videoElement.readyState !== 4) {
+      console.error("Video not ready for capture.");
       return;
     }
+
+    // Set canvas dimensions equal to video dimensions
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
 
     // Draw the video frame to the canvas
     context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
@@ -119,7 +114,6 @@ const Capture = () => {
       });
 
       if (response.status === 200) {
-        // Log the server response to the console
         console.log("Server Response:", response.data);
 
         toast.success("Emotion analysis successful!", {
