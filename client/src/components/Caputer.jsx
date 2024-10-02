@@ -8,6 +8,7 @@ const Capture = () => {
   const canvasRef = useRef(null); // Ref for canvas
   const mediaStreamRef = useRef(null); // Store the media stream
   const [isVideoPlaying, setIsVideoPlaying] = useState(false); // Track if video is playing
+  const [captureError, setCaptureError] = useState(null); // Track any errors during the capture process
 
   useEffect(() => {
     startCamera(); // Start the camera when the component mounts
@@ -17,7 +18,7 @@ const Capture = () => {
     };
   }, []);
 
-  // Start the camera and make sure the video is ready
+  // Start the camera and ensure the video is playing before capturing
   const startCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
@@ -30,12 +31,14 @@ const Capture = () => {
           videoRef.current.onloadeddata = () => {
             videoRef.current.play();
             setIsVideoPlaying(true); // Video is ready
+
             // Capture the image after a delay to ensure the video is playing
             setTimeout(captureImage, 2000); // Capture after 2 seconds
           };
         })
         .catch((err) => {
           console.error("Error accessing camera: ", err);
+          setCaptureError("Error accessing camera. Please check your camera settings.");
           toast.error("Error accessing camera. Please check your camera settings.", {
             position: "bottom-center",
             autoClose: 3000,
@@ -45,6 +48,16 @@ const Capture = () => {
             draggable: true,
           });
         });
+    } else {
+      setCaptureError("Your device does not support camera access.");
+      toast.error("Your device does not support camera access.", {
+        position: "bottom-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -64,6 +77,14 @@ const Capture = () => {
     // Ensure the video is loaded
     if (!videoElement || videoElement.readyState !== 4) {
       console.error("Video not ready for capture.");
+      toast.error("Video not ready for capture. Please try again.", {
+        position: "bottom-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
 
@@ -80,6 +101,14 @@ const Capture = () => {
         sendToBackend(blob); // Send the captured image to the backend
       } else {
         console.error("Failed to create image blob.");
+        toast.error("Failed to capture image. Please try again.", {
+          position: "bottom-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     }, "image/png");
 
@@ -133,8 +162,16 @@ const Capture = () => {
     <>
       <ToastContainer />
 
+      {/* Hidden Video and Canvas elements */}
       <video ref={videoRef} autoPlay muted style={{ display: "none" }}></video>
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+
+      {/* Optionally, display any errors if needed */}
+      {captureError && (
+        <div className="text-red-500 text-center mt-4">
+          {captureError}
+        </div>
+      )}
     </>
   );
 };
