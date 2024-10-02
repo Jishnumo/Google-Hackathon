@@ -7,22 +7,20 @@ const Capture = () => {
   const videoRef = useRef(null); // Ref for video stream (hidden)
   const canvasRef = useRef(null); // Ref for canvas
   const mediaStreamRef = useRef(null); // Store the media stream
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false); // Track if video is playing
+  const [capturedImage, setCapturedImage] = useState(null); // State to hold captured image
 
   useEffect(() => {
     startCamera(); // Start the camera when the component mounts
 
     const timer = setTimeout(() => {
-      if (isVideoPlaying) {
-        captureImage(); // Capture image once the video is playing
-      }
-    }, 5000); // Capture image after 5 seconds
+      captureImage(); // Automatically capture image after 5 seconds
+    }, 5000);
 
     return () => {
       stopCamera(); // Clean up camera stream on unmount
       clearTimeout(timer); // Clear the timer on unmount
     };
-  }, [isVideoPlaying]); // Depend on the video being ready
+  }, []);
 
   // Start the camera without showing the video
   const startCamera = () => {
@@ -32,11 +30,6 @@ const Capture = () => {
         .then((stream) => {
           mediaStreamRef.current = stream;
           videoRef.current.srcObject = stream;
-
-          // Listen for the video to start playing
-          videoRef.current.onloadeddata = () => {
-            setIsVideoPlaying(true); // Mark the video as playing
-          };
         })
         .catch((err) => {
           console.error("Error accessing camera: ", err);
@@ -81,6 +74,8 @@ const Capture = () => {
     // Convert canvas data to Blob
     canvas.toBlob((blob) => {
       if (blob) {
+        const url = URL.createObjectURL(blob);
+        setCapturedImage(url); // Set the captured image for preview
         sendToBackend(blob); // Send the captured image to the backend
       } else {
         console.error("Failed to create image blob.");
@@ -142,6 +137,14 @@ const Capture = () => {
 
       {/* Canvas to process the captured image (hidden) */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+
+      {/* Display the captured image */}
+      {capturedImage && (
+        <div className="preview-section">
+          <h3>Captured Image:</h3>
+          <img src={capturedImage} alt="Captured" style={{ width: "300px", height: "auto" }} />
+        </div>
+      )}
     </>
   );
 };
