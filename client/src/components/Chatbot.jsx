@@ -62,12 +62,12 @@ function Chatbot() {
 
   return (
     <div
-      className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br from-purple-700 via-pink-500 to-indigo-500 flex items-center justify-center p-4"
+      className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br  flex items-center justify-center p-4"
       style={{ zIndex: 9999 }} // Ensures it's on top of everything
     >
-      <div className="h-full w-full max-w-4xl bg-white shadow-2xl rounded-xl flex flex-col overflow-hidden">
+      <div className=" h-full w-full max-w-4xl  shadow-2xl rounded-xl flex flex-col overflow-hidden">
         {/* Chat Display */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-tl from-gray-100 via-gray-50 to-white">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((msg, index) => (
             <div
               key={index}
@@ -83,7 +83,7 @@ function Chatbot() {
         </div>
 
         {/* Input Area */}
-        <div className="bg-white border-t p-4 flex items-center justify-between">
+        <div className=" border-t p-4 flex items-center justify-between">
           <input
             type="text"
             value={userInput}
