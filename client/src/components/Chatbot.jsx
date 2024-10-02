@@ -75,7 +75,7 @@ function Chatbot() {
       className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center p-4"
       style={{ zIndex: 9999 }} // Ensures it's on top of everything
     >
-      <div className="h-[85%] w-full max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-8 mb-4">
+      <div className="h-[85%] w-full max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-8 mb-4"> {/* Adjusted height and added bottom margin */}
         {/* Chat Display */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((msg, index) => (
@@ -94,14 +94,14 @@ function Chatbot() {
         </div>
 
         {/* Input Area */}
-        <div className="flex items-center justify-between" style={{ background: 'transparent' }}> {/* Set background to transparent */}
+        <div className="p-0 flex items-center justify-between"> {/* Removed border-t */}
           <input
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-grow p-5 bg-transparent rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="flex-grow p-5 bg-gray-100 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             style={{ color: "black" }}
           />
           <button
