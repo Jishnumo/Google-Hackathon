@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AccpectTerms from "./Accpect_terms";
 import Chatbot from "./Chatbot";
-import Capture from "./Captuer";f
+import Capture from "./Captuer";
 
 const EmotionDetection = () => {
   const navigate = useNavigate();
