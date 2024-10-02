@@ -2,14 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import facescannobg from "../assets/facescannobg.gif";
 
-function Chatbot() {
+function Chatbot({ detectedEmotion }) {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Welcome! How can I assist you today?" },
   ]);
   const [userInput, setUserInput] = useState("");
   const [showGif, setShowGif] = useState(true); // State to control GIF visibility
-  const [detectedEmotion, setDetectedEmotion] = useState(""); // Detected emotion from backend
-
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -47,32 +45,17 @@ function Chatbot() {
       setShowGif(false);
     }, 6000); // 6 seconds for example
 
-    // Fetch the emotion analysis from the backend (after the image capture)
-    getEmotionFromBackend();
-
-    return () => clearTimeout(timer); // Cleanup on component unmount
-  }, []);
-
-  // Fetch emotion from backend after image analysis
-  const getEmotionFromBackend = async () => {
-    try {
-      const response = await axios.post("/api/emotion-check");
-      if (response.status === 200) {
-        const emotion = response.data.emotion; // Get detected emotion
-        setDetectedEmotion(emotion);
-
-        // Add the initial emotion-based response to the chat
-        const initialResponse = `It seems you're feeling ${emotion}. How can I help you today?`;
-        setMessages([...messages, { sender: "bot", text: initialResponse }]);
-      }
-    } catch (error) {
-      console.error("Error fetching emotion: ", error);
-      setMessages([
-        ...messages,
-        { sender: "bot", text: "Sorry, I couldn't detect your emotion." },
+    // If detectedEmotion is available, add a message based on it
+    if (detectedEmotion) {
+      const emotionMessage = `It seems you're feeling ${detectedEmotion}. How can I help you today?`;
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "bot", text: emotionMessage },
       ]);
     }
-  };
+
+    return () => clearTimeout(timer); // Cleanup on component unmount
+  }, [detectedEmotion]);
 
   // Handle sending a message
   const handleSendMessage = async () => {

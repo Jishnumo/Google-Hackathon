@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AccpectTerms from "./Accpect_terms";
 import Chatbot from "./Chatbot";
-import Capture from "./Caputer";
+import Capture from "./Capture";
 
 const EmotionDetection = () => {
   const navigate = useNavigate();
   const [isConsentGiven, setIsConsentGiven] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false); // Manage chatbot visibility
+  const [detectedEmotion, setDetectedEmotion] = useState(""); // Store detected emotion
 
   useEffect(() => {
     const consent = localStorage.getItem("hasVisited");
@@ -28,7 +29,10 @@ const EmotionDetection = () => {
     navigate("/");
   };
 
-  const handleCaptureComplete = () => {
+  const handleCaptureComplete = (emotion) => {
+    // Store detected emotion
+    setDetectedEmotion(emotion);
+
     // Delay the chatbot appearance by 3 seconds (3000ms)
     setTimeout(() => {
       setShowChatbot(true);
@@ -42,8 +46,8 @@ const EmotionDetection = () => {
       ) : (
         <>
           <Capture onCaptureComplete={handleCaptureComplete} />
-          {/* Conditionally render Chatbot after delay */}
-          {showChatbot && <Chatbot />}
+          {/* Conditionally render Chatbot after delay and pass detected emotion */}
+          {showChatbot && <Chatbot detectedEmotion={detectedEmotion} />}
         </>
       )}
     </div>
