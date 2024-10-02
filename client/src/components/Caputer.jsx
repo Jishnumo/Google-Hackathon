@@ -7,22 +7,17 @@ const Capture = () => {
   const videoRef = useRef(null); // Ref for video stream (hidden)
   const canvasRef = useRef(null); // Ref for canvas
   const mediaStreamRef = useRef(null); // Store the media stream
-  const [capturedImage, setCapturedImage] = useState(null); // State to hold captured image
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false); // Track if video is playing
 
   useEffect(() => {
     startCamera(); // Start the camera when the component mounts
 
-    const timer = setTimeout(() => {
-      captureImage(); // Automatically capture image after 5 seconds
-    }, 5000);
-
     return () => {
       stopCamera(); // Clean up camera stream on unmount
-      clearTimeout(timer); // Clear the timer on unmount
     };
   }, []);
 
-  // Start the camera without showing the video
+  // Start the camera and make sure the video is ready
   const startCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
@@ -30,6 +25,14 @@ const Capture = () => {
         .then((stream) => {
           mediaStreamRef.current = stream;
           videoRef.current.srcObject = stream;
+
+          // Wait for the video to start playing before capturing
+          videoRef.current.onloadeddata = () => {
+            videoRef.current.play();
+            setIsVideoPlaying(true); // Video is ready
+            // Capture the image after a delay to ensure the video is playing
+            setTimeout(captureImage, 2000); // Capture after 2 seconds
+          };
         })
         .catch((err) => {
           console.error("Error accessing camera: ", err);
@@ -59,7 +62,7 @@ const Capture = () => {
     const context = canvas.getContext("2d");
 
     // Ensure the video is loaded
-    if (videoElement.readyState !== 4) {
+    if (!videoElement || videoElement.readyState !== 4) {
       console.error("Video not ready for capture.");
       return;
     }
@@ -74,8 +77,6 @@ const Capture = () => {
     // Convert canvas data to Blob
     canvas.toBlob((blob) => {
       if (blob) {
-        const url = URL.createObjectURL(blob);
-        setCapturedImage(url); // Set the captured image for preview
         sendToBackend(blob); // Send the captured image to the backend
       } else {
         console.error("Failed to create image blob.");
@@ -137,14 +138,6 @@ const Capture = () => {
 
       {/* Canvas to process the captured image (hidden) */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-
-      {/* Display the captured image */}
-      {capturedImage && (
-        <div className="preview-section">
-          <h3>Captured Image:</h3>
-          <img src={capturedImage} alt="Captured" style={{ width: "300px", height: "auto" }} />
-        </div>
-      )}
     </>
   );
 };
