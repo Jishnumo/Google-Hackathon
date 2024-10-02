@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify"; // Import Toastify
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios"; // Import axios for making requests
 
 const Capture = () => {
   const videoRef = useRef(null); // Ref for video stream (hidden)
@@ -55,6 +56,11 @@ const Capture = () => {
     // Draw the video frame to the canvas
     context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
+    // Convert canvas data to Blob
+    canvas.toBlob((blob) => {
+      sendToBackend(blob); // Send the captured image to the backend
+    }, "image/png");
+
     // Stop the camera after capturing the image
     stopCamera();
 
@@ -67,6 +73,39 @@ const Capture = () => {
       pauseOnHover: true,
       draggable: true,
     });
+  };
+
+  // Send the captured image to the backend
+  const sendToBackend = async (imageBlob) => {
+    const formData = new FormData();
+    formData.append("file", imageBlob, "capture.png");
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/emotion-check", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 200) {
+        // Log the server response to the console
+        console.log("Server Response:", response.data);
+
+        toast.success("Emotion analysis successful!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } else {
+        toast.error(`Error analyzing the image. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      toast.error(`Error: ${error.message}`);
+    }
   };
 
   return (
