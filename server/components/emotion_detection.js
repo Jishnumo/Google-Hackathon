@@ -132,7 +132,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     console.log("Emotion Detection Response: ", responseText); // Debug response
 
     // Assuming the response contains the detected emotion
-    const detectedEmotion = 'happy'; // You can replace this with logic to extract the actual emotion
+    const detectedEmotion = extractEmotion(responseText); // Use a function to extract the actual emotion from the response
 
     // Call the generateChatResponse function to generate the chatbot response
     const chatbotResponse = await generateChatResponse(detectedEmotion, responseText);
@@ -153,3 +153,11 @@ router.post('/', upload.single('file'), async (req, res) => {
 });
 
 module.exports = router;
+
+// Utility function to extract emotion from response text
+function extractEmotion(responseText) {
+  // Example: Simple logic to extract the emotion from the responseText
+  const emotionRegex = /(?:feeling|emotion\sis)\s(\w+)/i;
+  const match = responseText.match(emotionRegex);
+  return match ? match[1].toLowerCase() : "neutral"; // Default to "neutral" if no match
+}

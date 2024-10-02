@@ -1,8 +1,9 @@
+// EmotionDetection.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AccpectTerms from "./Accpect_terms";
 import Chatbot from "./Chatbot";
-import Capture from "./Captuer";
+import Capture from "./Capture";
 
 const EmotionDetection = () => {
   const navigate = useNavigate();
