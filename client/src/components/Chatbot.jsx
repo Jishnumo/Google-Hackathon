@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 function Chatbot() {
@@ -6,6 +6,9 @@ function Chatbot() {
     { sender: "bot", text: "Welcome! How can I assist you today?" },
   ]);
   const [userInput, setUserInput] = useState("");
+
+  // Ref to manage auto-scrolling to the latest message
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     // Hide navbar and logo of the previous page
@@ -28,6 +31,13 @@ function Chatbot() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    // Scroll to the bottom whenever messages are updated
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   // Function to handle sending a message
   const handleSendMessage = async () => {
@@ -62,10 +72,10 @@ function Chatbot() {
 
   return (
     <div
-      className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br  flex items-center justify-center p-4"
+      className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center p-4"
       style={{ zIndex: 9999 }} // Ensures it's on top of everything
     >
-      <div className=" h-full w-full max-w-4xl  shadow-2xl rounded-xl flex flex-col overflow-hidden">
+      <div className="h-[85%] w-full max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-8 mb-4">
         {/* Chat Display */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((msg, index) => (
@@ -80,22 +90,23 @@ function Chatbot() {
               {msg.text}
             </div>
           ))}
+          <div ref={messagesEndRef} /> {/* Auto-scroll target */}
         </div>
 
         {/* Input Area */}
-        <div className=" border-t p-4 flex items-center justify-between">
+        <div className="flex items-center justify-between" style={{ background: 'transparent' }}> {/* Set background to transparent */}
           <input
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-grow p-3 bg-gray-100 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="flex-grow p-5 bg-transparent rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             style={{ color: "black" }}
           />
           <button
             onClick={handleSendMessage}
-            className="ml-4 bg-indigo-600 text-white py-3 px-6 rounded-full hover:bg-indigo-700 transition"
+            className="ml-4 bg-indigo-600 text-white py-5 px-8 rounded-full hover:bg-indigo-700 transition"
           >
             Send
           </button>
