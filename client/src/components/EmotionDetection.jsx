@@ -7,6 +7,7 @@ import Capture from "./Caputer";
 const EmotionDetection = () => {
   const navigate = useNavigate();
   const [isConsentGiven, setIsConsentGiven] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false); // Manage chatbot visibility
 
   useEffect(() => {
     const consent = localStorage.getItem("hasVisited");
@@ -27,14 +28,22 @@ const EmotionDetection = () => {
     navigate("/");
   };
 
+  const handleCaptureComplete = () => {
+    // Delay the chatbot appearance by 3 seconds (3000ms)
+    setTimeout(() => {
+      setShowChatbot(true);
+    }, 3000);
+  };
+
   return (
     <div>
       {!isConsentGiven ? (
         <AccpectTerms onConsent={handleConsent} onDeny={handleDeny} />
       ) : (
         <>
-          <Capture />
-          <Chatbot />
+          <Capture onCaptureComplete={handleCaptureComplete} />
+          {/* Conditionally render Chatbot after delay */}
+          {showChatbot && <Chatbot />}
         </>
       )}
     </div>
