@@ -133,10 +133,7 @@ const Capture = () => {
     <>
       <ToastContainer />
 
-      {/* Video stream for capturing the image (hidden) */}
       <video ref={videoRef} autoPlay muted style={{ display: "none" }}></video>
-
-      {/* Canvas to process the captured image (hidden) */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </>
   );
