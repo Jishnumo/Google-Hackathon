@@ -8,12 +8,12 @@ function Chatbot() {
   ]);
   const [userInput, setUserInput] = useState("");
   const [showGif, setShowGif] = useState(true); // State to control GIF visibility
+  const [detectedEmotion, setDetectedEmotion] = useState(""); // Detected emotion from backend
 
-  // Ref to manage auto-scrolling to the latest message
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // Hide navbar and logo of the previous page
+    // Hide the navbar and logo of the previous page
     const navbar = document.getElementById("navbar");
     const logo = document.getElementById("logo");
     if (navbar) {
@@ -35,22 +35,46 @@ function Chatbot() {
   }, []);
 
   useEffect(() => {
-    // Scroll to the bottom whenever messages are updated
+    // Automatically scroll to the bottom of chat when messages update
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   useEffect(() => {
-    // Hide the GIF after 3 seconds (adjust to match GIF duration)
+    // Hide the GIF after 3 seconds (adjust based on your GIF length)
     const timer = setTimeout(() => {
       setShowGif(false);
-    }, 5985); 
+    }, 6000); // 6 seconds for example
 
-    return () => clearTimeout(timer); // Cleanup timer on component unmount
+    // Fetch the emotion analysis from the backend (after the image capture)
+    getEmotionFromBackend();
+
+    return () => clearTimeout(timer); // Cleanup on component unmount
   }, []);
 
-  // Function to handle sending a message
+  // Fetch emotion from backend after image analysis
+  const getEmotionFromBackend = async () => {
+    try {
+      const response = await axios.post("/api/emotion-check");
+      if (response.status === 200) {
+        const emotion = response.data.emotion; // Get detected emotion
+        setDetectedEmotion(emotion);
+
+        // Add the initial emotion-based response to the chat
+        const initialResponse = `It seems you're feeling ${emotion}. How can I help you today?`;
+        setMessages([...messages, { sender: "bot", text: initialResponse }]);
+      }
+    } catch (error) {
+      console.error("Error fetching emotion: ", error);
+      setMessages([
+        ...messages,
+        { sender: "bot", text: "Sorry, I couldn't detect your emotion." },
+      ]);
+    }
+  };
+
+  // Handle sending a message
   const handleSendMessage = async () => {
     if (userInput.trim() === "") return;
 
@@ -72,9 +96,10 @@ function Chatbot() {
       ]);
     }
 
-    setUserInput(""); // Clear input
+    setUserInput(""); // Clear the input field
   };
 
+  // Trigger message sending on Enter key press
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
@@ -82,17 +107,14 @@ function Chatbot() {
   };
 
   return (
-    <div
-      className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center"
-      style={{ zIndex: 9999 }} // Ensures it's on top of everything
-    >
+    <div className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center">
       {/* Face ID Animation at the top, visible only if showGif is true */}
       {showGif && (
         <div className="absolute top-0 w-full flex justify-center pt-4">
           <img
-            src={facescannobg} // Replace with correct path
+            src={facescannobg}
             alt="Face ID Animation"
-            className="w-20 h-20" // Adjust width and height as needed
+            className="w-20 h-20"
           />
         </div>
       )}

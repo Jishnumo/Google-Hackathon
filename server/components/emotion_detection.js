@@ -77,7 +77,11 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     console.log("Response: ", responseText); // Debug response
 
-    res.status(200).json({ message: responseText });
+    // Assuming the response contains the detected emotion
+    const detectedEmotion = 'happy'; // Example response for emotion detection
+
+    // Send back the detected emotion
+    res.status(200).json({ emotion: detectedEmotion, message: responseText });
   } catch (error) {
     console.error('Error during AI conversation: ', error);
     res.status(500).json({ error: 'An error occurred while processing your request.' });
