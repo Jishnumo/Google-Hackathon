@@ -7,6 +7,7 @@ function Chatbot() {
     { sender: "bot", text: "Welcome! How can I assist you today?" },
   ]);
   const [userInput, setUserInput] = useState("");
+  const [showGif, setShowGif] = useState(true); // State to control GIF visibility
 
   // Ref to manage auto-scrolling to the latest message
   const messagesEndRef = useRef(null);
@@ -39,6 +40,15 @@ function Chatbot() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  useEffect(() => {
+    // Hide the GIF after 3 seconds (adjust to match GIF duration)
+    const timer = setTimeout(() => {
+      setShowGif(false);
+    }, 5985); 
+
+    return () => clearTimeout(timer); // Cleanup timer on component unmount
+  }, []);
 
   // Function to handle sending a message
   const handleSendMessage = async () => {
@@ -76,7 +86,19 @@ function Chatbot() {
       className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center"
       style={{ zIndex: 9999 }} // Ensures it's on top of everything
     >
-      <div className="w-full h-5/6 max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden  mt-28"> {/* Adjusted height and added bottom margin */}
+      {/* Face ID Animation at the top, visible only if showGif is true */}
+      {showGif && (
+        <div className="absolute top-0 w-full flex justify-center pt-4">
+          <img
+            src={facescannobg} // Replace with correct path
+            alt="Face ID Animation"
+            className="w-16 h-16" // Adjust width and height as needed
+          />
+        </div>
+      )}
+
+      {/* Main Chatbox Content */}
+      <div className="w-full h-5/6 max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-28">
         {/* Chat Display */}
         <div className="flex-1 overflow-y-auto p-6 space-y-2">
           {messages.map((msg, index) => (
@@ -93,14 +115,7 @@ function Chatbot() {
           ))}
           <div ref={messagesEndRef} /> {/* Auto-scroll target */}
         </div>
-        {/* Add GIF above the chat */}
-        <div className="flex justify-center mt-4">
-          <img
-            src={facescannobg} // Replace with correct path
-            alt="Face ID Animation"
-            className="w-32 h-32" // Adjust width and height as needed
-          />
-        </div>
+
         {/* Input Area */}
         <div className="mb-10 flex items-center justify-between">
           <input
