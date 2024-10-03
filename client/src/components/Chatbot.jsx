@@ -34,7 +34,7 @@ function Chatbot() {
   // Fetch emotion and chatbot response from backend after image analysis
   const getEmotionAndResponseFromBackend = async () => {
     try {
-      const response = await axios.post("/api/emotion-check");
+      const response = await axios.post("http://localhost:3000/api/emotion-check");
       if (response.status === 200) {
         const { emotion, message } = response.data;
         setDetectedEmotion(emotion); // Store detected emotion
