@@ -74,12 +74,12 @@ const Capture = ({ onCaptureComplete }) => {
       });
 
       if (response.status === 200) {
-        console.log("Emotion detected:", response.data.emotion);
+        console.log("Emotions detected:", response.data.emotions);
         toast.success("Emotion analysis successful!", { autoClose: 3000 });
 
         // Notify the parent that the capture and emotion detection is complete
         if (onCaptureComplete) {
-          onCaptureComplete(response.data.emotion); // Pass the detected emotion
+          onCaptureComplete(response.data.emotions); // Pass the detected emotions
         }
       } else {
         toast.error(`Error analyzing the image. Status: ${response.status}`);

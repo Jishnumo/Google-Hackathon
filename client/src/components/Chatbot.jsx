@@ -2,57 +2,28 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import facescannobg from "../assets/facescannobg.gif";
 
-function Chatbot() {
-  const [messages, setMessages] = useState([
-    { sender: "bot", text: "Welcome! How can I assist you today?" },
-  ]);
+function Chatbot({ detectedEmotions }) {
+  const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [showGif, setShowGif] = useState(true);
-  const [detectedEmotion, setDetectedEmotion] = useState(""); // Store detected emotion
-
   const messagesEndRef = useRef(null);
 
+  // Scroll to the last message whenever messages are updated
   useEffect(() => {
-    // Automatically scroll to the bottom of chat when messages update
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
+  // Handle the initial response based on detected emotions
   useEffect(() => {
-    // Hide the GIF after 3 seconds (adjust based on your GIF length)
-    const timer = setTimeout(() => {
-      setShowGif(false);
-    }, 6000); // 6 seconds for example
-
-    // Fetch emotion and chatbot response from backend after image analysis
-    getEmotionAndResponseFromBackend();
-
-    return () => clearTimeout(timer); // Cleanup on component unmount
-  }, []);
-
-  // Fetch emotion and chatbot response from backend after image analysis
-  const getEmotionAndResponseFromBackend = async () => {
-    try {
-      const response = await axios.post("http://localhost:3000/api/emotion-check");
-      if (response.status === 200) {
-        const { emotion, message } = response.data;
-        setDetectedEmotion(emotion); // Store detected emotion
-
-        // Add the initial emotion-based response to the chat
-        const initialResponse = `It seems you're feeling ${emotion}. How can I help you today?`;
-        setMessages([...messages, { sender: "bot", text: initialResponse }, { sender: "bot", text: message }]);
-      }
-    } catch (error) {
-      console.error("Error fetching emotion: ", error);
-      setMessages([
-        ...messages,
-        { sender: "bot", text: "Sorry, I couldn't detect your emotion." },
-      ]);
+    if (detectedEmotions && detectedEmotions.length > 0) {
+      const initialResponse = `I’ve detected that you are feeling ${detectedEmotions.join(", ")}. How can I assist you today?`;
+      setMessages([{ sender: "bot", text: initialResponse }]); // Set the first message directly
+      setShowGif(false); // Hide the GIF once the response is displayed
     }
-  };
+  }, [detectedEmotions]);
 
-  // Handle sending a message
   const handleSendMessage = async () => {
     if (userInput.trim() === "") return;
 
@@ -61,16 +32,18 @@ function Chatbot() {
     setMessages(newMessages);
 
     try {
-      // Send user's message to backend and get AI-generated response
       const response = await axios.post("/api/chatbot", { message: userInput });
       const botResponse = response.data.reply;
 
       // Add bot's response to the chat
-      setMessages([...newMessages, { sender: "bot", text: botResponse }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "bot", text: botResponse },
+      ]);
     } catch (error) {
       console.error("Error sending message:", error);
-      setMessages([
-        ...newMessages,
+      setMessages((prevMessages) => [
+        ...prevMessages,
         { sender: "bot", text: "Error: Unable to reach the server." },
       ]);
     }
@@ -78,7 +51,6 @@ function Chatbot() {
     setUserInput(""); // Clear the input field
   };
 
-  // Trigger message sending on Enter key press
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
@@ -87,16 +59,12 @@ function Chatbot() {
 
   return (
     <div className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center">
-      {/* Face ID Animation at the top, visible only if showGif is true */}
       {showGif && (
         <div className="absolute top-0 w-full flex justify-center pt-4">
           <img src={facescannobg} alt="Face ID Animation" className="w-20 h-20" />
         </div>
       )}
-
-      {/* Main Chatbox Content */}
       <div className="w-full h-5/6 max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-28">
-        {/* Chat Display */}
         <div className="flex-1 overflow-y-auto p-6 space-y-2">
           {messages.map((msg, index) => (
             <div
@@ -110,10 +78,9 @@ function Chatbot() {
               {msg.text}
             </div>
           ))}
-          <div ref={messagesEndRef} /> {/* Auto-scroll target */}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
         <div className="mb-10 flex items-center justify-between">
           <input
             type="text"
