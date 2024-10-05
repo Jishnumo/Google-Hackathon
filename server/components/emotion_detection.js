@@ -1,22 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const path = require('path');
-const fs = require('fs');
-const upload = require('./upload'); // Multer middleware for file handling
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { GoogleAIFileManager } = require('@google/generative-ai/server');
+const multer = require("multer"); // Multer middleware for handling file uploads
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleAIFileManager } = require("@google/generative-ai/server");
+const fs = require("fs");
+const path = require("path");
 
-// Google Generative AI initialization
+
 const apiKey = process.env.API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
 
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Store file in memory
+});
+
+// Helper function to upload file to Google Gemini
 async function uploadToGemini(filePath, mimeType) {
   try {
-    console.log(`Attempting to upload file: ${filePath}`);
     const uploadResult = await fileManager.uploadFile(filePath, {
       mimeType,
-      displayName: 'capture.png', // Fixed display name
+      displayName: "capture.png",
     });
     const file = uploadResult.file;
     console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
@@ -27,23 +32,25 @@ async function uploadToGemini(filePath, mimeType) {
   }
 }
 
-// Route to handle file upload and Google Generative AI processing
-router.post('/', upload.single('file'), async (req, res) => {
+// Route to handle file upload and process with Google Generative AI (Gemini)
+router.post("/", upload.single("image"), async (req, res) => {
   try {
-    const { prompt } = req.body;
-    const filePath = path.join(__dirname, '../uploads/capture.png'); 
-    const mimeType = req.file.mimetype;
+    const { prompt } = req.body; // Optional prompt, default to emotion detection message
+    const imageBuffer = req.file.buffer; // Get the image buffer from the uploaded file
+    const mimeType = req.file.mimetype; // Get the MIME type of the image
 
-    if (!fs.existsSync(filePath)) {
-      console.error("File does not exist: " + filePath);
-      return res.status(400).json({ error: 'File not found: capture.png' });
-    }
+    // Define the temporary file path
+    const tempFilePath = path.join(__dirname, "../uploads", "capture.png");
 
-    // Upload the image to Google Gemini
-    const uploadedFile = await uploadToGemini(filePath, mimeType);
+    // Write the image buffer to a temporary file
+    fs.writeFileSync(tempFilePath, imageBuffer);
 
+    // Upload the image file path to Google Gemini
+    const uploadedFile = await uploadToGemini(tempFilePath, mimeType);
+
+    // Configure the Gemini model for emotion detection
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: "gemini-1.5-flash",
     });
 
     const generationConfig = {
@@ -51,36 +58,56 @@ router.post('/', upload.single('file'), async (req, res) => {
       topP: 0.95,
       topK: 64,
       maxOutputTokens: 8192,
-      responseMimeType: 'application/json',
+      responseMimeType: "application/json",
     };
 
+    // Start a chat session with the Gemini model
     const chatSession = model.startChat({
       generationConfig,
       history: [
         {
-          role: 'user',
+          role: "user",
           parts: [
             {
               fileData: {
-                mimeType: uploadedFile.mimeType,
-                fileUri: uploadedFile.uri,
+                mimeType: uploadedFile.mimeType, // Set file MIME type
+                fileUri: uploadedFile.uri, // Use file URI from upload result
               },
             },
-            { text: prompt || 'Please analyze the emotion in this image.' },
+            { text: prompt || "Please analyze the emotion in this image and return only the emotion in this format: { emotion: '<emotionValue>' }."}, // Default prompt if none is provided
           ],
         },
       ],
     });
 
-    const result = await chatSession.sendMessage(prompt || 'Analyze the emotion in this image.');
-    const responseText = await result.response.text(); // Get response text
 
-    console.log("Response: ", responseText); // Debug response
+    const result = await chatSession.sendMessage(
+      prompt || "Analyze the emotion in this image."
+    );
+    const responseText = await result.response.text(); // Get the text response from the model
 
-    res.status(200).json({ message: responseText });
+    console.log("Response from AI: ", responseText); // Log the response for debugging
+
+   
+    //!fs.unlinkSync(tempFilePath); 
+
+    // Parse the JSON response string
+    let jsonResponse;
+    try {
+      jsonResponse = JSON.parse(responseText); // Parse the string to JSON
+    } catch (error) {
+      console.error("Error parsing response JSON: ", error);
+      return res.status(500).json({ error: "Error parsing response from AI." });
+    }
+
+    // Send the AI response back to the frontend
+    res.status(200).json(jsonResponse); // Send the parsed JSON response
   } catch (error) {
-    console.error('Error during AI conversation: ', error);
-    res.status(500).json({ error: 'An error occurred while processing your request.' });
+    console.error("Error during AI conversation: ", error);
+    // Ensure to only send one response
+    if (!res.headersSent) {
+      return res.status(500).json({ error: "An error occurred while processing your request." });
+    }
   }
 });
 

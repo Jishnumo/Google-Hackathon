@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import navlogo from "../assets/healio.png"
+import navlogo from "../assets/healio.png";
 
 const Navbar = () => {
   const [state, setState] = useState(false);
@@ -12,8 +11,13 @@ const Navbar = () => {
     { title: 'Services', path: '/services' },
   ];
 
+  const handleSignInClick = () => {
+    // Add your sign-in logic here, e.g., navigating to a sign-in page
+    console.log("Sign In Clicked");
+  };
+
   return (
-    <nav className="fixed  w-full py-3 md:fixed md:text-base md:border-none">
+    <nav className="fixed w-full py-3 md:fixed md:text-base md:border-none">
       <div className="items-center px-4 max-w-screen-2xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between py-3 md:py-5 md:block">
           <Link to="/">
@@ -62,13 +66,11 @@ const Navbar = () => {
           </div>
         </div>
         <div
-          className={`flex-1 pb-3 mt-8 md:block md:pb-0 md:mt-0 ${
-            state ? 'block' : 'hidden'
-          }`}
+          className={`flex-1 pb-3 mt-8 md:block md:pb-0 md:mt-0 ${state ? 'block' : 'hidden'}`}
         >
           <ul className="font-semibold justify-end items-center space-y-6 md:flex md:space-x-6 md:space-y-0">
             {navigation.map((item, idx) => (
-              <li key={idx} className=" text-yellow-200 hover:text-violet-600">
+              <li key={idx} className="text-yellow-200 hover:text-violet-600">
                 <Link to={item.path} className="block">
                   {item.title}
                 </Link>
@@ -76,21 +78,13 @@ const Navbar = () => {
             ))}
             <span className="hidden w-px h-6 bg-gray-300 md:block"></span>
             <div className="space-y-3 items-center gap-x-6 md:flex md:space-y-0">
-              {/* <li>
-                <Link
-                  to="/chatbot"
-                  className="block py-3 text-center text-gray-700 hover:text-violet-600 border rounded-lg md:border-none"
-                >
-                  <i className="fa-solid fa-right-to-bracket"></i> Chatbot
-                </Link>
-              </li> */}
               <li>
-                <a
-                  href="javascript:void(0)"
+                <button
+                  onClick={handleSignInClick}
                   className="block py-3 px-4 font-medium text-center text-lime-50 bg-violet-600 hover:bg-violet-600 active:bg-violet-600 active:shadow-none rounded-lg shadow md:inline"
                 >
                   Sign In
-                </a>
+                </button>
               </li>
             </div>
           </ul>

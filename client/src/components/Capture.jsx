@@ -1,101 +1,98 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useEffect, useState } from 'react';
 import { toast, ToastContainer } from "react-toastify"; // Import Toastify
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios"; // Import axios for making requests
+import axios from 'axios';
+import LoadingGif from './LoadingGif';
 
 const Capture = ({ onCaptureComplete }) => {
-  const videoRef = useRef(null); // Ref for video stream (hidden)
-  const canvasRef = useRef(null); // Ref for canvas
-  const mediaStreamRef = useRef(null); // Store the media stream
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [showGif, setShowGif] = useState(true);//faceID
 
   useEffect(() => {
-    startCamera(); // Start the camera when the component mounts
+    // Request webcam access
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch((error) => {
+        console.error("Error accessing webcam:", error);
+      });
+
+    // Automatically capture the image after a few seconds (e.g., 3 seconds)
+    const captureTimeout = setTimeout(() => {
+      captureImage();
+    }, 3000);
 
     return () => {
-      stopCamera(); // Clean up camera stream on unmount
+      clearTimeout(captureTimeout);
     };
   }, []);
 
-  // Start the camera
-  const startCamera = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          mediaStreamRef.current = stream;
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadeddata = () => {
-            videoRef.current.play();
-            setTimeout(captureImage, 2000); // Capture after 2 seconds
-          };
-        })
-        .catch((err) => {
-          console.error("Error accessing camera: ", err);
-        });
-    }
-  };
-
-  // Stop the camera stream
-  const stopCamera = () => {
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-    }
-  };
-
-  // Capture the image
   const captureImage = () => {
-    const videoElement = videoRef.current;
     const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
+    const video = videoRef.current;
 
-    canvas.width = videoElement.videoWidth;
-    canvas.height = videoElement.videoHeight;
-    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    if (canvas && video) {
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height); // Capture frame from video
 
-    canvas.toBlob((blob) => {
-      if (blob) {
-        sendToBackend(blob); // Send the captured image to the backend
-      } else {
-        console.error("Failed to create image blob.");
-      }
-    }, "image/png");
+      // Convert canvas to a Blob (image file) for sending to the backend
+      canvas.toBlob((blob) => {
+        console.log("Image captured:", blob); // Debugging
+        toast.success("Image captured successfully!");
 
-    stopCamera();
+      
+
+        // Send the image to the backend
+        sendToBackend(blob);
+      }, 'image/png');
+    }
   };
 
-  // Send the image to the backend and call onCaptureComplete when successful
   const sendToBackend = async (imageBlob) => {
     const formData = new FormData();
-    formData.append("file", imageBlob, "capture.png");
+    formData.append('image', imageBlob); // Append image file to the form data
 
     try {
-      const response = await axios.post("http://localhost:3000/api/emotion-check", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      // Post the image to the backend API
+      const response = await axios.post('http://localhost:3000/api/emotion-check', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+      
+      setShowGif(false);
+      const emotion = response.data.emotion; 
+      console.log("Emotion detected:", emotion); // Debugging: Print the emotion
 
-      if (response.status === 200) {
-        console.log("Emotion detected:", response.data.emotion);
-        toast.success("Emotion analysis successful!", { autoClose: 3000 });
+      // Store emotion in sessionStorage
+      // sessionStorage.setItem("detectedEmotion", emotion); 
 
-        // Notify the parent that the capture and emotion detection is complete
-        if (onCaptureComplete) {
-          onCaptureComplete(response.data.emotion); // Pass the detected emotion
-        }
-      } else {
-        toast.error(`Error analyzing the image. Status: ${response.status}`);
-      }
+      // Show success notification
+      toast.success("Emotion successfully analyzed!");
+
+      // Notify parent component that capture and emotion analysis is complete
+      onCaptureComplete(emotion);
     } catch (error) {
-      console.error("Error: ", error);
-      toast.error(`Error: ${error.message}`);
+      console.error("Error analyzing emotion:", error);
+      toast.error("Failed to analyze emotion");
     }
   };
 
   return (
-    <>
-      <ToastContainer />
-      <video ref={videoRef} autoPlay muted style={{ display: "none" }}></video>
-      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-    </>
+    <div>
+      {/* Hide the video element using inline styles */}
+      <video ref={videoRef} width="640" height="480" autoPlay style={{ display: 'none' }} />
+      <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} /> 
+
+      {showGif && <LoadingGif />}
+      
+      <ToastContainer /> {/* Container to show notifications */}
+    </div>
   );
 };
 
