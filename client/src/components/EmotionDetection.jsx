@@ -44,7 +44,7 @@ const EmotionDetection = () => {
           {/* Capture component will pass emotion back when done */}
           <Capture onCaptureComplete={handleCaptureComplete} />
 
-          {/* Chatbot activates only after capture and emotion detection */}
+          {/* Chatbot activates only after capture and emotion detection is complete */}
           {isCaptureComplete && <Chatbot initialEmotion={detectedEmotion} />}
         </>
       )}

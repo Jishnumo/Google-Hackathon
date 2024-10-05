@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import facescannobg from "../assets/facescannobg.gif";
 
-function Chatbot({ detectedEmotions }) {
+function Chatbot({ initialEmotion }) {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
-  const [showGif, setShowGif] = useState(true);
   const messagesEndRef = useRef(null);
 
   // Scroll to the last message whenever messages are updated
@@ -15,14 +13,32 @@ function Chatbot({ detectedEmotions }) {
     }
   }, [messages]);
 
-  // Handle the initial response based on detected emotions
+  // Store initial emotion in session storage
   useEffect(() => {
-    if (detectedEmotions && detectedEmotions.length > 0) {
-      const initialResponse = `I’ve detected that you are feeling ${detectedEmotions.join(", ")}. How can I assist you today?`;
+    if (initialEmotion) {
+      sessionStorage.setItem("detectedEmotion", initialEmotion); // Store the emotion
+      const initialResponse = generateInitialResponse(initialEmotion);
       setMessages([{ sender: "bot", text: initialResponse }]); // Set the first message directly
-      setShowGif(false); // Hide the GIF once the response is displayed
     }
-  }, [detectedEmotions]);
+  }, [initialEmotion]);
+
+  // Generate initial bot response based on the detected emotion
+  const generateInitialResponse = (emotion) => {
+    switch (emotion) {
+      case "happy":
+        return "I'm glad to see you happy! What made you smile today?";
+      case "sad":
+        return "I see you're feeling a bit sad. Is there anything you'd like to talk about?";
+      case "angry":
+        return "It seems like something is bothering you. Want to share what's on your mind?";
+      case "surprised":
+        return "Wow! You look surprised. What caught you off guard?";
+      case "neutral":
+        return "You seem calm. How can I assist you today?";
+      default:
+        return "Hello! How can I help you today?";
+    }
+  };
 
   const handleSendMessage = async () => {
     if (userInput.trim() === "") return;
@@ -31,8 +47,15 @@ function Chatbot({ detectedEmotions }) {
     const newMessages = [...messages, { sender: "user", text: userInput }];
     setMessages(newMessages);
 
+    // Retrieve the detected emotion from session storage
+    const detectedEmotion = sessionStorage.getItem("detectedEmotion");
+
     try {
-      const response = await axios.post("/api/chatbot", { message: userInput });
+      const response = await axios.post("http://localhost:3000/api/chatbot", {
+        message: userInput,
+        emotion: detectedEmotion // Send the detected emotion
+      });
+
       const botResponse = response.data.reply;
 
       // Add bot's response to the chat
@@ -59,11 +82,6 @@ function Chatbot({ detectedEmotions }) {
 
   return (
     <div className="fixed inset-0 h-screen w-screen z-50 bg-gradient-to-br flex items-center justify-center">
-      {showGif && (
-        <div className="absolute top-0 w-full flex justify-center pt-4">
-          <img src={facescannobg} alt="Face ID Animation" className="w-20 h-20" />
-        </div>
-      )}
       <div className="w-full h-5/6 max-w-4xl shadow-2xl rounded-xl flex flex-col overflow-hidden mt-28">
         <div className="flex-1 overflow-y-auto p-6 space-y-2">
           {messages.map((msg, index) => (
