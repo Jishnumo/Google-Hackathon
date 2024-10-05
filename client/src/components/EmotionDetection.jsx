@@ -7,8 +7,8 @@ import Capture from "./Capture";
 const EmotionDetection = () => {
   const navigate = useNavigate();
   const [isConsentGiven, setIsConsentGiven] = useState(false);
-  const [detectedEmotion, setDetectedEmotion] = useState(""); // Store detected emotion
-  const [isCaptureComplete, setIsCaptureComplete] = useState(false); // Flag to check if capture is done
+  const [detectedEmotion, setDetectedEmotion] = useState("");
+  const [isCaptureComplete, setIsCaptureComplete] = useState(false);
 
   useEffect(() => {
     const consent = localStorage.getItem("hasVisited");
@@ -29,10 +29,9 @@ const EmotionDetection = () => {
     navigate("/");
   };
 
-  // Callback function to handle when capture and emotion analysis is complete
   const handleCaptureComplete = (emotion) => {
-    setDetectedEmotion(emotion); // Set the detected emotion from Capture.js
-    setIsCaptureComplete(true); // Capture is done, activate chatbot
+    setDetectedEmotion(emotion);
+    setIsCaptureComplete(true);
   };
 
   return (
@@ -41,10 +40,7 @@ const EmotionDetection = () => {
         <AccpectTerms onConsent={handleConsent} onDeny={handleDeny} />
       ) : (
         <>
-          {/* Capture component will pass emotion back when done */}
-          <Capture onCaptureComplete={handleCaptureComplete} />
-
-          {/* Chatbot activates only after capture and emotion detection is complete */}
+          {!isCaptureComplete && <Capture onCaptureComplete={handleCaptureComplete} />}
           {isCaptureComplete && <Chatbot initialEmotion={detectedEmotion} />}
         </>
       )}
