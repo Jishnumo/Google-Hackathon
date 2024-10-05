@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import navlogo from "../assets/healio.png";
 
 const Navbar = () => {
   const [state, setState] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const navigation = [
     { title: 'Home', path: '/' },
     { title: 'About', path: '/about' },
     { title: 'Services', path: '/services' },
+    { title: 'Sign In', path: '/signin'},
   ];
 
   const handleSignInClick = () => {
-    // Add your sign-in logic here, e.g., navigating to a sign-in page
     console.log("Sign In Clicked");
+    navigate('/signin'); // Navigate to the sign-in page
   };
 
   return (
@@ -80,7 +82,7 @@ const Navbar = () => {
             <div className="space-y-3 items-center gap-x-6 md:flex md:space-y-0">
               <li>
                 <button
-                  onClick={handleSignInClick}
+                  onClick={handleSignInClick} // Trigger navigation to the sign-in page
                   className="block py-3 px-4 font-medium text-center text-lime-50 bg-violet-600 hover:bg-violet-600 active:bg-violet-600 active:shadow-none rounded-lg shadow md:inline"
                 >
                   Sign In

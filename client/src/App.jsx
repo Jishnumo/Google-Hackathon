@@ -7,17 +7,21 @@ import Services from "./components/Services";
 import Chatbot from "./components/Chatbot";
 import EmotionDetection from "./components/EmotionDetection";
 import Footer from "./components/Footer";
+import SignupForm from "./components/Signin";
+import Signin from "./components/Signin";
 
 const App = () => {
   return (
     <Router>
       <Navbar />
       <Routes>
+      
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/chatbot" element={<EmotionDetection />} />
         <Route path="/emotion-detection" element={<EmotionDetection />} />
+        <Route path="/signin" element={<Signin />} />
       </Routes>
       {/* <Footer /> */}
     </Router>
