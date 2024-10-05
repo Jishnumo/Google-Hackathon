@@ -6,14 +6,14 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 
-const AccpectTerms = ({ onConsent, onDeny }) => {
+const AcceptTerms = ({ onConsent, onDeny }) => {
   const [open, setOpen] = React.useState(true);
   const [isPhotoConsent, setIsPhotoConsent] = React.useState(false);
   const [isTermsConsent, setIsTermsConsent] = React.useState(false);
 
   const handleAllow = () => {
     if (isPhotoConsent && isTermsConsent) {
-      onConsent(); 
+      onConsent();
       setOpen(false);
     } else {
       alert("You must agree to both terms and consent for photo capture to proceed.");
@@ -22,14 +22,13 @@ const AccpectTerms = ({ onConsent, onDeny }) => {
 
   const handleDeny = () => {
     onDeny();
-    setOpen(false); 
+    setOpen(false);
   };
 
   return (
     <div>
-
       <Dialog
-        open={open} 
+        open={open}
         onClose={handleDeny}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -38,13 +37,14 @@ const AccpectTerms = ({ onConsent, onDeny }) => {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             This application uses facial recognition to analyze your emotions. Please review the following consent before proceeding:
+          </DialogContentText>
+          <div style={{ marginTop: "1rem" }}>
             <ul>
               <li>Your photo will be used only for emotion analysis within this application.</li>
               <li>We will not store or share your photo with any third parties.</li>
               <li>You can withdraw your consent at any time.</li>
             </ul>
-          </DialogContentText>
-
+          </div>
           <div style={{ marginTop: "1rem" }}>
             <div>
               <input
@@ -82,4 +82,4 @@ const AccpectTerms = ({ onConsent, onDeny }) => {
   );
 };
 
-export default AccpectTerms;
+export default AcceptTerms;
