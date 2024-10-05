@@ -112,7 +112,7 @@ const generateInitialResponse = (emotion) => {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="mb-10 flex items-center justify-between">
+        <div className="mb-10 flex items-center justify-between px-5">
           <input
             type="text"
             value={userInput}
