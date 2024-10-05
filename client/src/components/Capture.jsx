@@ -45,7 +45,7 @@ const Capture = ({ onCaptureComplete }) => {
         console.log("Image captured:", blob); // Debugging
         toast.success("Image captured successfully!");
 
-        setShowGif(false);
+      
 
         // Send the image to the backend
         sendToBackend(blob);
@@ -64,7 +64,8 @@ const Capture = ({ onCaptureComplete }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+      
+      setShowGif(false);
       const emotion = response.data.emotion; 
       console.log("Emotion detected:", emotion); // Debugging: Print the emotion
 

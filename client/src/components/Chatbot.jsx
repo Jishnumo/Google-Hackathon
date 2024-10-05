@@ -22,23 +22,36 @@ function Chatbot({ initialEmotion }) {
     }
   }, [initialEmotion]);
 
-  // Generate initial bot response based on the detected emotion
-  const generateInitialResponse = (emotion) => {
-    switch (emotion) {
-      case "happy":
-        return "I'm glad to see you happy! What made you smile today?";
-      case "sad":
-        return "I see you're feeling a bit sad. Is there anything you'd like to talk about?";
-      case "angry":
-        return "It seems like something is bothering you. Want to share what's on your mind?";
-      case "surprised":
-        return "Wow! You look surprised. What caught you off guard?";
-      case "neutral":
-        return "You seem calm. How can I assist you today?";
-      default:
-        return "Hello! How can I help you today?";
-    }
-  };
+// Generate initial bot response based on the detected emotion
+const generateInitialResponse = (emotion) => {
+  switch (emotion) {
+    case "happy":
+      return "I'm glad to see you happy! What made you smile today?";
+    case "sad":
+      return "I see you're feeling a bit sad. Is there anything you'd like to talk about?";
+    case "angry":
+      return "It seems like something is bothering you. Want to share what's on your mind?";
+    case "surprised":
+      return "Wow! You look surprised. What caught you off guard?";
+    case "neutral":
+      return "You seem calm. How can I assist you today?";
+    case "fearless":
+      return "That's great to hear! Being fearless is a wonderful mindset. What's driving that confidence?";
+    case "anxious":
+      return "I understand that feeling anxious can be tough. Is there something specific that's on your mind?";
+    case "excited":
+      return "Excitement is contagious! What are you looking forward to?";
+    case "bored":
+      return "Feeling bored? Let's change that! What would you like to talk about or do?";
+    case "confused":
+      return "Confusion can be overwhelming. What seems to be puzzling you right now?";
+    case "overwhelmed":
+      return "It sounds like you're feeling a bit overwhelmed. Do you want to talk about what's on your plate?";
+    default:
+      return "Hello! How can I help you today?";
+  }
+};
+
 
   const handleSendMessage = async () => {
     if (userInput.trim() === "") return;
