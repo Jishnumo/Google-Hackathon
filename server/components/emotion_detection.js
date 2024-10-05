@@ -74,7 +74,7 @@ router.post("/", upload.single("image"), async (req, res) => {
                 fileUri: uploadedFile.uri, // Use file URI from upload result
               },
             },
-            { text: prompt || "Please analyze the emotion in this image." }, // Default prompt if none is provided
+            { text: prompt || "Please analyze the emotion in this image and return only the emotion in this format: { emotion: '<emotionValue>' }."}, // Default prompt if none is provided
           ],
         },
       ],
